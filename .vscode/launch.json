@@ -1,0 +1,29 @@
+
+{
+    "version": "0.2.0",
+    "configurations": [
+       {
+          "name": "(gdb) Debug Executable",
+          "type": "cppdbg",
+          "request": "launch",
+          "program": "/home/pgmabv/openacr/bin/samp_tut1a",  // Path to your executable
+          "args": [],  // Add any command-line arguments if needed
+          "stopAtEntry": false,
+          "cwd": "/home/pgmabv/openacr",
+          "environment": [],
+          "externalConsole": false,
+          "MIMode": "gdb",  // or "lldb" if using lldb
+          "setupCommands": [
+             {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+             }
+          ],
+          "miDebuggerPath": "/usr/bin/gdb",  // Path to gdb, modify if necessary
+          "preLaunchTask": "",  // If there's a pre-build task
+          "internalConsoleOptions": "openOnSessionStart"
+       }
+    ]
+ }
+ 
