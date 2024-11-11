@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "aitask",
+        "type": "shell",
+        "command": "ai",
+        "args": [
+            "${fileBasenameNoExtension}"         // Compile the currently opened file
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": ["$gcc"],
+        "detail": "Compile a C++ file to an executable"
+      }
+    ]
+  }
+  

@@ -21,7 +21,7 @@
              }
           ],
           "miDebuggerPath": "/usr/bin/gdb",  // Path to gdb, modify if necessary
-          "preLaunchTask": "",  // If there's a pre-build task
+          "preLaunchTask": "aitask",  //  run ai
           "internalConsoleOptions": "openOnSessionStart"
        }
     ]
