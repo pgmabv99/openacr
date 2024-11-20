@@ -217,6 +217,7 @@ void myns::mcb_t::add_order(algo::Smallstr50 part_key, int quantity)
     order_obj->order = order_key;
     order_obj->p_part = part_obj;
     order_obj->quantity = quantity;
+    order_obj->filled = false;
     if (order_XrefMaybe(*order_obj))
     {
         prlog("order  inserted in memory with xref " << order_obj->order
