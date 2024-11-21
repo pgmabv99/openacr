@@ -22,27 +22,33 @@
 #include "include/samp_tut3.h"
 
 void samp_tut3::zd_value_Step() {
-    Value &value = *zd_value_First();
-    prlog(algo::CurrUnTime() << " "<< value.value);
-    value_Delete(value);
+    Value &value_obj = *zd_value_First();
+    prlog(algo::CurrUnTime() << " "<< value_obj.value);
+    value_Delete(value_obj);
+    // ind_beg(samp_tut3::_db_zd_value_curs,value_obj,samp_tut3::_db ){
+    //     prlog(algo::CurrUnTime() << " "<< value_obj.value);
+    // }
+    // ind_end;
 }
 
-void samp_tut3::update_Step() {
-    int num=algo::get_cycles() % 10;
-    if (Value *value=ind_value_Find(num)) {
-        prlog("deleted "<<value->value);
-        value_Delete(*value);
-    }
-    if (ind_value_N()==0) {
-        _db.update=false;
-    }
-}
+// void samp_tut3::update_Step() {
+//     int num=algo::get_cycles() % 10;
+//     if (Value *value=ind_value_Find(num)) {
+//         prlog("deleted "<<value->value);
+//         value_Delete(*value);
+//     }
+//     if (ind_value_N()==0) {
+//         _db.update=false;
+//     }
+// }
 
 void samp_tut3::Main() {
     for (int i=0; i < 10; i++) {
-        Value &value=value_Alloc();
-        value.value=i;
-        value_XrefMaybe(value);
+        cstring tmpstr;
+        Value &value_obj=value_Alloc();
+        // value_obj.value=i;
+        value_obj.value=tmpstr << "value_" << i;
+        value_XrefMaybe(value_obj);
     }
     samp_tut3::MainLoop();
 }
