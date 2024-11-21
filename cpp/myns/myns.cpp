@@ -28,16 +28,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/epoll.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 
 #define MAX_EVENTS 10
 #define PORT 8080
 #define BUFFER_SIZE 512
+#define CMD_SIZE 4
 
 namespace myns
 {
@@ -57,12 +53,15 @@ namespace myns
         ~mcb_t();
         static void mcb_exit(mcb_t *mcb = nullptr);
         static void scan();
+
         static void test_delete();
         static void test_update(algo::Smallstr50 part_key);
         static void add_part();
-        static void add_order(algo::Smallstr50 part_key, int quantity);
-        static void add_orders();
+        static bool add_order(algo::Smallstr50 part_key, int quantity);
+        static void add_orders_manually();
+        static void fill_orders();
         static void test_save();
+        static void cmd_execute(char cmd[CMD_SIZE]);
 
         // for tcp
         static void tcp_listen();
@@ -72,7 +71,7 @@ namespace myns
 
         // for terminal
         static void trm_listen();
-        static void trm_read();
+    static void trm_read();
 
     private:
         static algo::Smallstr50 eyecatcher;
@@ -103,10 +102,41 @@ void myns::mcb_t::scan()
     prlog("==scan  ");
     ind_beg(myns::_db_zd_part_curs, part_obj, myns::_db)
     {
-        prlog("=" << Keyval("part", part_obj.part) << Keyval("amount", part_obj.amt) << Keyval("f_amt", part_obj.f_amt));
+        prlog("=" << Keyval("part", part_obj.part) << Keyval("amount", part_obj.amt));
         ind_beg(myns::part_zd_order_curs, order_obj, part_obj)
         {
-            prlog("=== " << Keyval("order", order_obj.order) << Keyval("quantity", order_obj.quantity));
+            prlog("=== " << Keyval("order", order_obj.order)
+                         << Keyval("quantity", order_obj.quantity)
+                         << Keyval("filled", order_obj.filled));
+        };
+        ind_end;
+    }
+    ind_end;
+}
+
+void myns::mcb_t::fill_orders(){
+    prlog("==fill orders  ");
+    ind_beg(myns::_db_zd_part_curs, part_obj, myns::_db)
+    {
+        prlog("=" << Keyval("part", part_obj.part));
+        ind_beg(myns::part_zd_order_curs, order_obj, part_obj)
+        {
+            if (!order_obj.filled)
+            {
+                if (part_obj.amt >= order_obj.quantity)
+                {
+                    part_obj.amt -= order_obj.quantity;
+                    order_obj.filled = true;
+                    prlog("=== " << Keyval("order", order_obj.order)
+                                 << Keyval("quantity", order_obj.quantity)
+                                 << Keyval("filled", order_obj.filled));
+                }
+                else
+                {
+                    prlog("=== " << Keyval("order", order_obj.order)
+                                 << " not enough stock");
+                }
+            }
         };
         ind_end;
     }
@@ -198,7 +228,7 @@ void myns::mcb_t::add_part()
     };
 };
 
-void myns::mcb_t::add_orders()
+void myns::mcb_t::add_orders_manually()
 {
     add_order(algo::Smallstr50("part98"), 98);
     add_order(algo::Smallstr50("part99"), 99);
@@ -208,13 +238,21 @@ void myns::mcb_t::add_orders()
     add_order(algo::Smallstr50("part66"), 66);
 }
 
-void myns::mcb_t::add_order(algo::Smallstr50 part_key, int quantity)
+bool myns::mcb_t::add_order(algo::Smallstr50 part_key, int quantity)
 {
-    myns::FPart *part_obj = myns::ind_part_Find(part_key);
+    bool retval = true;
+    myns::FPart *part_obj;
+    if (!(part_obj = myns::ind_part_Find(part_key))){
+        prlog("part not found " << part_key);
+        retval = false;
+        return retval;
+    }
+
     myns::Order *order_obj = &order_Alloc();
     algo::cstring order_key;
     order_key << part_key << "_order_" << part_obj->zd_order_n;
     order_obj->order = order_key;
+
     order_obj->p_part = part_obj;
     order_obj->quantity = quantity;
     order_obj->filled = false;
@@ -229,8 +267,13 @@ void myns::mcb_t::add_order(algo::Smallstr50 part_key, int quantity)
 
         prlog("xref: fail to insert  " << order_obj->order);
         order_Delete(*order_obj);
+        retval = false;
     };
+    return retval;
 }
+
+
+
 
 void myns::mcb_t::test_save()
 {
@@ -362,43 +405,53 @@ void myns::mcb_t::tcp_read(myns::Client &client_obj)
 {
     prlog("==tcp_read fd " << client_obj.read.fildes.value);
     char buffer[BUFFER_SIZE];
+    ssize_t buffer_len;
+    char response[BUFFER_SIZE];
+    ssize_t response_len;
 
-    ssize_t count;
-    count = read(client_obj.read.fildes.value, buffer, sizeof(buffer) - 1);
-    if (count > 0)
+    buffer_len = read(client_obj.read.fildes.value, buffer, sizeof(buffer) - 1);
+    if (buffer_len > 0)
     {
-        buffer[count] = '\0'; // Null-terminate the buffer
+        buffer[buffer_len] = '\0'; // Null-terminate the buffer
         prlog("Received from client fd " << client_obj.read.fildes.value << " buffer " << buffer);
 
         // Parse buffer into 6-byte char array and integer using sscanf
-        char part_key[7]; // 6 bytes for the string part + 1 for the null terminator
-        int amt;
+        char part_key[7] = ""; // 6 bytes for the string part + 1 for the null terminator
+        int amt =0 ;
         sscanf(buffer, "%6s%d", part_key, &amt);
 
         prlog("part_key: " << part_key << ", amt: " << amt);
 
         // add the order
-        add_order(algo::Smallstr50(part_key), amt);
+        auto retval=add_order(algo::Smallstr50(part_key), amt);
 
-        // Echo the data back to the client
-        if (write(client_obj.read.fildes.value, buffer, count) == -1)
+        // response  to the client
+        if (retval)
+        {
+
+            response_len = sprintf(response, "added order for part %s with quantity %d \n", part_key, amt);
+        }
+        else
+        {
+            response_len = sprintf(response, "Failed to add order for part %s with quantity %d \n", part_key, amt);
+        }
+        if (write(client_obj.read.fildes.value, response, response_len) == -1)
         {
             prlog("write error" << client_obj.read.fildes.value);
             tcp_close(client_obj);
         }
     }
-    if (count == -1 && errno != EAGAIN)
+    if (buffer_len == -1 && errno != EAGAIN)
     {
         prlog("read error" << client_obj.read.fildes.value);
         tcp_close(client_obj);
     }
-    else if (count == 0)
+    else if (buffer_len == 0)
     {
         prlog("Client  disconnected " << client_obj.read.fildes.value);
         tcp_close(client_obj);
     }
 
-    scan();
 }
 
 void myns::mcb_t::trm_listen()
@@ -417,42 +470,50 @@ void myns::mcb_t::trm_read()
 {
     // prlog("==trm_read");
     char buffer[BUFFER_SIZE];
-    ssize_t count;
-#define CMD_LEN 4
-    count = read(_db.terminal.fildes.value, buffer, sizeof(buffer) - 1);
-    if (count > 0)
-    {
-        buffer[count] = '\0';
+    ssize_t buffer_len;
 
-        char cmd[CMD_LEN + 1];
-        strncpy(cmd, buffer, CMD_LEN);
-        cmd[CMD_LEN] = '\0';
-        if (strcmp(cmd, "show") == 0)
-        {
-            scan();
-        }
-        else if (strcmp(cmd, "save") == 0)
-        {
-            test_save();
-        }
-        else if (strcmp(cmd, "exit") == 0)
-        {
-            mcb_exit();
-        }
-        else
-        {
-            prlog("unknown command");
-        }
+    buffer_len = read(_db.terminal.fildes.value, buffer, sizeof(buffer) - 1);
+    if (buffer_len > 0)
+    {
+        buffer[buffer_len] = '\0';
+        char cmd[CMD_SIZE + 1];
+        strncpy(cmd, buffer, CMD_SIZE);
+        cmd[CMD_SIZE] = '\0';
+        cmd_execute(cmd);
     }
-    if (count == -1 && errno != EAGAIN)
+    if (buffer_len == -1 && errno != EAGAIN)
     { // no code ?
     }
-    else if (count == 0)
+    else if (buffer_len == 0)
     {
         IohookRemove(_db.terminal);
     }
 }
 
+void myns::mcb_t::cmd_execute(char cmd[CMD_SIZE])
+{
+
+    if (strcmp(cmd, "show") == 0)
+    {
+        scan();
+    }
+    else if (strcmp(cmd, "save") == 0)
+    {
+        test_save();
+    }
+    else if (strcmp(cmd, "exit") == 0)
+    {
+        mcb_exit();
+    }
+    else if (strcmp(cmd, "fill") == 0)
+    {
+        fill_orders();
+    }
+    else
+    {
+        prlog("unknown command");
+    }
+}
 
 void myns::Main()
 {
@@ -472,7 +533,7 @@ void myns::Main()
     // part_key = "part98";
     // mcb->test_update(part_key);
     // mcb->scan();
-    // mcb->add_orders();
+    // mcb->add_orders_manually();
     // mcb->scan();
 
     mcb->tcp_listen();
