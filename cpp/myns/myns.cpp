@@ -104,7 +104,7 @@ void myns::Mcb::scan_db_part_order()
     ind_beg(myns::_db_zd_part_curs, part_obj, myns::_db)
     {
         prlog("=" << Keyval("part", part_obj.part) << Keyval("amount", part_obj.amt));
-        ind_beg(myns::part_zd_order_curs, order_obj, part_obj)
+        ind_beg(myns::part_zd_partorder_curs, order_obj, part_obj)
         {
             prlog("=== " << Keyval("order", order_obj.order)
                          << Keyval("quantity", order_obj.quantity)
@@ -117,14 +117,14 @@ void myns::Mcb::scan_db_part_order()
 
 void myns::Mcb::scan_db_order()
 {
-    // prlog("==scn_db_order  ");
-    // ind_beg(myns::_db_zd_order_curs, order_obj, myns::_db)
-    // {
-    //     prlog("=== " << Keyval("order", order_obj.order)
-    //                     << Keyval("quantity", order_obj.quantity)
-    //                     << Keyval("filled", order_obj.filled));
-    // };
-    // ind_end;
+    prlog("==scn_db_order directly !!  ");
+    ind_beg(myns::_db_zd_order_curs, order_obj, myns::_db)
+    {
+        prlog("=== " << Keyval("order", order_obj.order)
+                        << Keyval("quantity", order_obj.quantity)
+                        << Keyval("filled", order_obj.filled));
+    };
+    ind_end;
 }
 
 void myns::Mcb::fill_orders(){
@@ -132,7 +132,7 @@ void myns::Mcb::fill_orders(){
     ind_beg(myns::_db_zd_part_curs, part_obj, myns::_db)
     {
         prlog("=" << Keyval("part", part_obj.part));
-        ind_beg(myns::part_zd_order_curs, order_obj, part_obj)
+        ind_beg(myns::part_zd_partorder_curs, order_obj, part_obj)
         {
             if (!order_obj.filled)
             {
@@ -263,7 +263,7 @@ bool myns::Mcb::add_order(algo::Smallstr50 part_key, int quantity)
 
     myns::Order *order_obj = &order_Alloc();
     algo::cstring order_key;
-    order_key << part_key << "_order_" << part_obj->zd_order_n;
+    order_key << part_key << "_order_" << part_obj->zd_partorder_n;
     order_obj->order = order_key;
 
     order_obj->p_part = part_obj;
@@ -310,7 +310,7 @@ void myns::Mcb::test_save()
 
 void myns::sched1_Step() {
     prlog("sched1_step enter"<<algo::CurrUnTime());
-    Mcb::scan_db_part_order();
+    Mcb::scan_db_order();
 }
 // =================
 
