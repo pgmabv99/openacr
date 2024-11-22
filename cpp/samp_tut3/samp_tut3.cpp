@@ -31,9 +31,19 @@ void samp_tut3::zd_value_Step() {
     // ind_end;
 }
 
+// void samp_tut3::update_Step()
+// {
+//     ind_beg(samp_tut3::_db_zd_value_curs, value_obj, samp_tut3::_db)
+//     {
+//         prlog(algo::CurrUnTime() << " " << value_obj.value);
+//     }
+//     ind_end;
+// }
 // void samp_tut3::update_Step() {
+//     prlog("update_step enter"<<algo::CurrUnTime());
 //     int num=algo::get_cycles() % 10;
-//     if (Value *value=ind_value_Find(num)) {
+//     cstring tmpstr;
+//     if (Value *value=ind_value_Find(tmpstr<<"value_"<<num)) {
 //         prlog("deleted "<<value->value);
 //         value_Delete(*value);
 //     }

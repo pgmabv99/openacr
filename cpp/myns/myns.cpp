@@ -52,7 +52,8 @@ namespace myns
         Mcb();
         ~Mcb();
         static void terminate_mcb(Mcb *mcb = nullptr);
-        static void scan();
+        static void scan_db_part_order();
+        static void scan_db_order();
 
         static void test_delete();
         static void test_update(algo::Smallstr50 part_key);
@@ -97,9 +98,9 @@ myns::Mcb::~Mcb()
     prlog("destroy instance " << eyecatcher);
 }
 
-void myns::Mcb::scan()
+void myns::Mcb::scan_db_part_order()
 {
-    prlog("==scan  ");
+    prlog("==scn_db_part_order  ");
     ind_beg(myns::_db_zd_part_curs, part_obj, myns::_db)
     {
         prlog("=" << Keyval("part", part_obj.part) << Keyval("amount", part_obj.amt));
@@ -112,6 +113,18 @@ void myns::Mcb::scan()
         ind_end;
     }
     ind_end;
+}
+
+void myns::Mcb::scan_db_order()
+{
+    // prlog("==scn_db_order  ");
+    // ind_beg(myns::_db_zd_order_curs, order_obj, myns::_db)
+    // {
+    //     prlog("=== " << Keyval("order", order_obj.order)
+    //                     << Keyval("quantity", order_obj.quantity)
+    //                     << Keyval("filled", order_obj.filled));
+    // };
+    // ind_end;
 }
 
 void myns::Mcb::fill_orders(){
@@ -293,6 +306,11 @@ void myns::Mcb::test_save()
     //     }ind_end;
     //    prlog(text);
     //    mynsdb::SaveTuples();
+}
+
+void myns::sched1_Step() {
+    prlog("sched1_step enter"<<algo::CurrUnTime());
+    Mcb::scan_db_part_order();
 }
 // =================
 
@@ -495,7 +513,7 @@ void myns::Mcb::cmd_execute(char cmd[CMD_SIZE])
 
     if (strcmp(cmd, "show") == 0)
     {
-        scan();
+        scan_db_part_order();
     }
     else if (strcmp(cmd, "save") == 0)
     {
@@ -522,19 +540,19 @@ void myns::Main()
     myns::Mcb *mcb = new myns::Mcb();
 
     // mcb->add_part();
-    // mcb->scan();
+    // mcb->scan_db_part_order();
 
     // // mcb->test_delete();
-    // // mcb->scan();
+    // // mcb->scan_db_part_order();
 
     // algo::Smallstr50 part_key;
     // part_key = "part5";
     // mcb->test_update(part_key);
     // part_key = "part98";
     // mcb->test_update(part_key);
-    // mcb->scan();
+    // mcb->scan_db_part_order();
     // mcb->add_orders_manually();
-    // mcb->scan();
+    // mcb->scan_db_part_order();
 
     mcb->tcp_listen();
     mcb->trm_listen();
