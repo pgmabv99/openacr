@@ -53,7 +53,8 @@ namespace myns
         ~Mcb();
         static void terminate_mcb(Mcb *mcb = nullptr);
         static void scan_db_part_order();
-        static void scan_db_order();
+        static void scan_zd_db_order_via_sched1_fstep();
+        static void scan_zd_db_order_via_own_fstep();
 
         static void test_delete();
         static void test_update(algo::Smallstr50 part_key);
@@ -115,9 +116,20 @@ void myns::Mcb::scan_db_part_order()
     ind_end;
 }
 
-void myns::Mcb::scan_db_order()
+void myns::Mcb::scan_zd_db_order_via_sched1_fstep()
 {
-    prlog("==scn_db_order directly !!  ");
+    prlog("==scn_db_order via zd !!  ");
+    ind_beg(myns::_db_zd_order_curs, order_obj, myns::_db)
+    {
+        prlog("=== " << Keyval("order", order_obj.order)
+                        << Keyval("quantity", order_obj.quantity)
+                        << Keyval("filled", order_obj.filled));
+    };
+    ind_end;
+}
+void myns::Mcb::scan_zd_db_order_via_own_fstep()
+{
+    prlog("==scn_db_order via zd !!  ");
     ind_beg(myns::_db_zd_order_curs, order_obj, myns::_db)
     {
         prlog("=== " << Keyval("order", order_obj.order)
@@ -175,7 +187,7 @@ void myns::Mcb::test_update(algo::Smallstr50 part_key)
 
 void myns::Mcb::test_delete()
 {
-    // delete by obj
+    // delete by obj. comment out because Part_delete not generated
     // algo::Smallstr50 part_key;
     // myns::FPart *part_obj;
 
@@ -243,12 +255,16 @@ void myns::Mcb::add_part()
 
 void myns::Mcb::add_orders_manually()
 {
-    add_order(algo::Smallstr50("part98"), 98);
-    add_order(algo::Smallstr50("part99"), 99);
+
+    for (auto i = 0; i < 10; i++)
+    {
+        add_order(algo::Smallstr50("part98"), 10);
+        add_order(algo::Smallstr50("part99"), 10);
+    }
     // duplicate order
-    add_order(algo::Smallstr50("part99"), 99);
+    add_order(algo::Smallstr50("part99"), 10);
     // non-existing part
-    add_order(algo::Smallstr50("part66"), 66);
+    add_order(algo::Smallstr50("part66"), 10);
 }
 
 bool myns::Mcb::add_order(algo::Smallstr50 part_key, int quantity)
@@ -309,8 +325,13 @@ void myns::Mcb::test_save()
 }
 
 void myns::sched1_Step() {
-    prlog("sched1_step enter"<<algo::CurrUnTime());
-    Mcb::scan_db_order();
+    prlog("Enter  " << __func__ << " at " << algo::CurrUnTime());
+    Mcb::scan_zd_db_order_via_sched1_fstep();
+}
+
+void myns::zd_order_Step() {
+    prlog("Enter  " << __func__ << " at " << algo::CurrUnTime());
+    Mcb::scan_zd_db_order_via_own_fstep();
 }
 // =================
 
@@ -522,6 +543,10 @@ void myns::Mcb::cmd_execute(char cmd[CMD_SIZE])
     else if (strcmp(cmd, "exit") == 0)
     {
         terminate_mcb();
+    }
+    else if (strcmp(cmd, "addo") == 0)
+    {
+        add_orders_manually();
     }
     else if (strcmp(cmd, "fill") == 0)
     {
