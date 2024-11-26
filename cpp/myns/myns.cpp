@@ -29,6 +29,8 @@
 #include <string.h>
 #include <errno.h>
 #include <arpa/inet.h>
+#include <iostream>    // For std::cerr, std::endl
+#include <fstream>     // For std::ofstream
 
 #define MAX_EVENTS 10
 #define PORT 8080
@@ -73,8 +75,10 @@ namespace myns
 
         // for terminal
         static void trm_listen();
-    static void trm_read();
 
+        inline static int step_invocation_count = 0;
+
+        static void trm_read();
     private:
         static algo::Smallstr50 eyecatcher;
         static std::vector<part_data_t> part_data;
@@ -129,6 +133,14 @@ void myns::Mcb::scan_zd_db_order_via_sched1_fstep()
 }
 void myns::Mcb::scan_zd_db_order_via_own_fstep()
 {
+    myns::Mcb::step_invocation_count++;
+    std::ofstream outfile("av_openacr/myfile.txt");
+    if (outfile.is_open()) {
+        outfile << "step_invocation_count: " << myns::Mcb::step_invocation_count << std::endl;
+        outfile.close();
+    } else {
+        prlog("Unable to open file");
+    }
     prlog("==scn_db_order via zd !!  ");
     ind_beg(myns::_db_zd_order_curs, order_obj, myns::_db)
     {
