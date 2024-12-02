@@ -16,7 +16,8 @@
 // Target: myns (exe) -- create program and inherit from db
 // Exceptions: yes
 // Source: cpp/myns/myns.cpp
-//
+// fix1
+// fix2
 
 #include "include/algo.h"
 #include "include/algo.h"
