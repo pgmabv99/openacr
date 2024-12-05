@@ -21,26 +21,12 @@
 
 #include "cpp/myns/util.h"
 
+// define
+// todo : try to move the vars to namespace
+int step_invocation_count=0;
+std::vector<myns::part_data_t> part_data(N_PART);
 
-// Definition of static members
-algo::Smallstr50 myns::Mcb::eyecatcher;
-std::vector<myns::part_data_t> myns::Mcb::part_data;
-
-// constructor
-myns::Mcb::Mcb()
-{
-    eyecatcher = "Mcb";
-    prlog("create instance  " << eyecatcher);
-    part_data.resize(N_PART);
-}
-
-// destructor
-myns::Mcb::~Mcb()
-{
-    prlog("destroy instance " << eyecatcher);
-}
-
-void myns::Mcb::scan_db_part_order()
+void myns::scan_db_part_order()
 {
     prlog("==scn_db_part_order  ");
     ind_beg(myns::_db_zd_part_curs, part_obj, myns::_db)
@@ -57,28 +43,33 @@ void myns::Mcb::scan_db_part_order()
     ind_end;
 }
 
-void myns::Mcb::scan_zd_db_order_via_sched1_fstep()
+void myns::scan_zd_db_order_via_sched1_fstep()
 {
-    prlog("==scn_db_order via zd !!  ");
+    prlog("Enter  " << __func__ << " at " << algo::CurrUnTime()<< "step invocation count " << step_invocation_count);
+    std::ofstream outfile("av_openacr/myfile.txt");
+    if (outfile.is_open())
+    {
+        outfile << "step_invocation_count: " << step_invocation_count << std::endl;
+        outfile.close();
+    }
+    else
+    {
+        prlog("Unable to open file");
+    }
     ind_beg(myns::_db_zd_order_curs, order_obj, myns::_db)
     {
         prlog("=== " << Keyval("order", order_obj.order)
-                        << Keyval("quantity", order_obj.quantity)
-                        << Keyval("filled", order_obj.filled));
+                     << Keyval("quantity", order_obj.quantity)
+                     << Keyval("filled", order_obj.filled));
     };
     ind_end;
 }
-void myns::Mcb::scan_zd_db_order_via_own_fstep()
+
+void myns::scan_zd_db_order_via_own_fstep()
 {
-    myns::Mcb::step_invocation_count++;
-    std::ofstream outfile("av_openacr/myfile.txt");
-    if (outfile.is_open()) {
-        outfile << "step_invocation_count: " << myns::Mcb::step_invocation_count << std::endl;
-        outfile.close();
-    } else {
-        prlog("Unable to open file");
-    }
-    prlog("==scn_db_order via zd !!  ");
+    prlog("Enter  " << __func__ );
+
+
     ind_beg(myns::_db_zd_order_curs, order_obj, myns::_db)
     {
         prlog("=== " << Keyval("order", order_obj.order)
@@ -88,7 +79,7 @@ void myns::Mcb::scan_zd_db_order_via_own_fstep()
     ind_end;
 }
 
-void myns::Mcb::fill_orders(){
+void myns::fill_orders(){
     prlog("==fill orders  ");
     ind_beg(myns::_db_zd_part_curs, part_obj, myns::_db)
     {
@@ -117,7 +108,7 @@ void myns::Mcb::fill_orders(){
     ind_end;
 }
 
-void myns::Mcb::test_update(algo::Smallstr50 part_key)
+void myns::test_update(algo::Smallstr50 part_key)
 {
     myns::FPart *part_obj;
     prlog("==find and update  by key : " << part_key);
@@ -134,7 +125,7 @@ void myns::Mcb::test_update(algo::Smallstr50 part_key)
     }
 }
 
-void myns::Mcb::test_delete()
+void myns::test_delete()
 {
     // delete by obj. comment out because Part_delete not generated
     // algo::Smallstr50 part_key;
@@ -169,7 +160,7 @@ void myns::Mcb::test_delete()
     return;
 }
 
-void myns::Mcb::add_part()
+void myns::add_part()
 {
     prlog("==generate data (exercize in char vs str vs Smallstr) ");
 
@@ -202,10 +193,10 @@ void myns::Mcb::add_part()
     };
 };
 
-void myns::Mcb::add_orders_manually()
+void myns::add_orders_manually()
 {
 
-    for (auto i = 0; i < 10; i++)
+    for (auto i = 0; i < 2; i++)
     {
         add_order(algo::Smallstr50("part98"), 10);
         add_order(algo::Smallstr50("part99"), 10);
@@ -216,7 +207,7 @@ void myns::Mcb::add_orders_manually()
     add_order(algo::Smallstr50("part66"), 10);
 }
 
-bool myns::Mcb::add_order(algo::Smallstr50 part_key, int quantity)
+bool myns::add_order(algo::Smallstr50 part_key, int quantity)
 {
     bool retval = true;
     myns::FPart *part_obj;
@@ -253,7 +244,7 @@ bool myns::Mcb::add_order(algo::Smallstr50 part_key, int quantity)
 
 
 
-void myns::Mcb::test_save()
+void myns::test_save()
 {
     // cstring text;
     // ind_beg(amc::_db_tracefld_curs, tracefld, amc::_db) {
@@ -276,7 +267,7 @@ void myns::Mcb::test_save()
 
 // =================
 
-void myns::Mcb::tcp_listen()
+void myns::tcp_listen()
 {
     // Create a TCP socket
     int server_fd;
@@ -327,7 +318,7 @@ void myns::Mcb::tcp_listen()
 }
 
 // called on events on listening socket
-void myns::Mcb::tcp_accept()
+void myns::tcp_accept()
 {
     struct sockaddr_in client_address;
     int addrlen = sizeof(client_address);
@@ -373,7 +364,7 @@ void myns::Mcb::tcp_accept()
 }
 
 // called on events on client socket like err/eof
-void myns::Mcb::tcp_close(myns::Client &client_obj)
+void myns::tcp_close(myns::Client &client_obj)
 {
     close(client_obj.read.fildes.value);
     IohookRemove(client_obj.read);
@@ -381,7 +372,7 @@ void myns::Mcb::tcp_close(myns::Client &client_obj)
 };
 
 // called on events on client socket like read/write
-void myns::Mcb::tcp_read(myns::Client &client_obj)
+void myns::tcp_read(myns::Client &client_obj)
 {
     prlog("==tcp_read fd " << client_obj.read.fildes.value);
     char buffer[BUFFER_SIZE];
@@ -434,7 +425,7 @@ void myns::Mcb::tcp_read(myns::Client &client_obj)
 
 }
 
-void myns::Mcb::trm_listen()
+void myns::trm_listen()
 {
     _db.terminal.fildes = algo::Fildes(0);
     algo::SetBlockingMode(_db.terminal.fildes, false);
@@ -446,7 +437,7 @@ void myns::Mcb::trm_listen()
     IohookAdd(_db.terminal, flags);
 }
 
-void myns::Mcb::trm_read()
+void myns::trm_read()
 {
     // prlog("==trm_read");
     char buffer[BUFFER_SIZE];
@@ -470,7 +461,7 @@ void myns::Mcb::trm_read()
     }
 }
 
-void myns::Mcb::cmd_execute(char cmd[CMD_SIZE])
+void myns::cmd_execute(char cmd[CMD_SIZE])
 {
 
     if (strcmp(cmd, "show") == 0)
@@ -483,7 +474,7 @@ void myns::Mcb::cmd_execute(char cmd[CMD_SIZE])
     }
     else if (strcmp(cmd, "exit") == 0)
     {
-        terminate_mcb();
+        myns::terminate_mcb();
     }
     else if (strcmp(cmd, "addo") == 0)
     {
@@ -499,37 +490,39 @@ void myns::Mcb::cmd_execute(char cmd[CMD_SIZE])
     }
 }
 
+
 void myns::Main()
 {
     prlog("tests");
+    step_invocation_count=0;
 
-    myns::Mcb *mcb = new myns::Mcb();
+    add_part();
+    add_orders_manually();
 
-    // mcb->add_part();
-    // mcb->scan_db_part_order();
+    // scan_db_part_order();
 
-    // // mcb->test_delete();
-    // // mcb->scan_db_part_order();
+    // myns::test_delete();
+    // scan_db_part_order();
 
     // algo::Smallstr50 part_key;
     // part_key = "part5";
-    // mcb->test_update(part_key);
+    // test_update(part_key);
     // part_key = "part98";
-    // mcb->test_update(part_key);
-    // mcb->scan_db_part_order();
-    // mcb->add_orders_manually();
-    // mcb->scan_db_part_order();
+    // test_update(part_key);
+    // scan_db_part_order();
+    // scan_db_part_order();
 
-    mcb->tcp_listen();
-    mcb->trm_listen();
+    tcp_listen();
+    trm_listen();
 
     myns::MainLoop();
-    mcb->terminate_mcb(mcb);
+    terminate_mcb();
 }
+// void myns::Mcb::terminate_mcb(Mcb *mcb)
+void myns::terminate_mcb()
 
-void myns::Mcb::terminate_mcb(Mcb *mcb)
 {
     prlog("==done 35");
-    delete mcb;
+    // delete mcb;
     exit(EXIT_SUCCESS);
 }
