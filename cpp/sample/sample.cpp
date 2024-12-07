@@ -16,7 +16,7 @@
 // Target: sample (exe)
 // Exceptions: yes
 // Source: cpp/sample/sample.cpp
-//
+// fix1
 
 #include "include/algo.h"
 #include "include/algo.h"
