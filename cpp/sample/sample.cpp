@@ -16,6 +16,7 @@
 // Target: sample (exe)
 // Exceptions: yes
 // Source: cpp/sample/sample.cpp
+//
 // fix1
 
 #include "include/algo.h"
@@ -23,11 +24,22 @@
 #include "include/sample.h"
 
 void sample::CreateRecord(int i) {
-    sample::FRec &rec = rec_Alloc();
-    rec.rec.key1=i;
-    rec.rec.key2=i;
-    rec_XrefMaybe(rec);
-    prlog("I created "<<rec.rec);
+    sample::FRec &rec_obj = rec_Alloc();
+    // heap key
+    rec_obj.rec.key1=i;
+    rec_obj.rec.key2=i;
+    cstring key3 ;
+    key3 << "rec_" << i;
+    rec_obj.rec.key3=key3;
+    // separate hash key
+    rec_obj.hashkey = i+100;
+    rec_XrefMaybe(rec_obj);
+    if (!rec_XrefMaybe(rec_obj)) {
+        prlog("did NOT cross reference "<<rec_obj.rec);
+        rec_Delete(rec_obj);
+    }else{
+        prlog("added  and cross referenced "<<rec_obj.rec);
+    }
 }
 
 
@@ -35,52 +47,21 @@ int step_count = 0;
 void sample::bh_rec_Step() {
     int r = random() % 100;
     step_count++;
-    sample::FRec* rec1 = bh_rec_First();
-    prlog("found :step_count " <<step_count << " " << rec1->rec << " bh_rec_count " << bh_rec_N());
+    sample::FRec* rec_obj1 = bh_rec_First();
+    prlog("found :step_count " <<step_count << " " << rec_obj1->rec << " bh_rec_count " << bh_rec_N());
     if (r > 50) {
-        prlog("delay by 10: "<<rec1->rec);
-        rec1->rec.key2 += 10;
-        bh_rec_Reheap(*rec1);
+        prlog("delay by 10: "<<rec_obj1->rec);
+        rec_obj1->rec.key2 += 10;
+        bh_rec_Reheap(*rec_obj1);
     } else if (r > 25 && bh_rec_N()>1) {
         prlog("process and delete: "<<bh_rec_First()->rec);
-        rec_Delete(*rec1);
+        rec_Delete(*rec_obj1);
     } else {
         CreateRecord(random() % 10);
     }
 }
 
 
-// namespace sample {
-//     void bh_rec_process();
-// };
-
-// void sample::bh_rec_Step()
-// {
-//     sample::bh_rec_process();
-// }
-
-
-// void sample::bh_rec_process()
-// {
-//     sample::FRec *rec1 = bh_rec_First();
-//     prlog("found : " << rec1->rec << " bh_rec_count " << bh_rec_N());
-//     if (step_count%2 == 0)
-//     {
-//         prlog("delay by 10: " << rec1->rec);
-//         // rec1->rec.key1 += 10;
-//         rec1->rec.key2 += 10;
-//         bh_rec_Reheap(*rec1);
-//     }
-//     else
-//     {
-//         if (bh_rec_N() > 1)
-//         {
-//             prlog("process and delete: " << rec1->rec << " bh_rec_count " << bh_rec_N());
-//             rec_Delete(*rec1);
-//         }
-//     }
-//     step_count++;
-// }
 
 // 
 void sample::Main() {
@@ -88,9 +69,9 @@ void sample::Main() {
         CreateRecord(i);
     }
 
-    sample::Reckey key(0,1,"");
-    if (sample::FRec *rec = ind_rec_Find(key)) {
-        prlog("I found "<<rec->rec);
+    auto hashkey1=101;
+    if (sample::FRec *rec_obj = ind_hashkey_Find(hashkey1)) {
+        prlog("I found "<<rec_obj->rec <<" with hashkey "<<hashkey1);
     }
     sample::MainLoop();
 }
