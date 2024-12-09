@@ -57,7 +57,9 @@ void sample::bh_rec_Step() {
         prlog("process and delete: "<<bh_rec_First()->rec);
         rec_Delete(*rec_obj1);
     } else {
-        CreateRecord(random() % 10);
+        int rint = random() % 100;
+        prlog("create new: "<<rint);
+        CreateRecord(rint);
     }
 }
 
@@ -68,7 +70,7 @@ void sample::Main() {
     for (int i=0; i<5; i++) {
         CreateRecord(i);
     }
-
+    prlog("fix 1")
     auto hashkey1=101;
     if (sample::FRec *rec_obj = ind_hashkey_Find(hashkey1)) {
         prlog("I found "<<rec_obj->rec <<" with hashkey "<<hashkey1);
