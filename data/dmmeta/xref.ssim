@@ -669,6 +669,8 @@ dmmeta.xref  field:orgfile.FDb.ind_filename  inscond:true  via:""
 dmmeta.xref  field:orgfile.FDb.ind_filehash  inscond:true  via:""
 dmmeta.xref  field:orgfile.FFilehash.c_filename  inscond:true  via:orgfile.FDb.ind_filehash/orgfile.FFilename.filehash
 dmmeta.xref  field:orgfile.FFilename.p_filehash  inscond:true  via:orgfile.FDb.ind_filehash/orgfile.FFilename.filehash
+dmmeta.xref  field:sample.FDb.ind_hashkey  inscond:true  via:""
+dmmeta.xref  field:sample.FDb.bh_rec  inscond:true  via:""
 dmmeta.xref  field:samp_meng.FDb.ind_symbol  inscond:true  via:""
 dmmeta.xref  field:samp_meng.FDb.cd_fdin_eof  inscond:false  via:""
 dmmeta.xref  field:samp_meng.FDb.cd_fdin_read  inscond:false  via:""

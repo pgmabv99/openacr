@@ -70,7 +70,7 @@ void sample::Main() {
     for (int i=0; i<5; i++) {
         CreateRecord(i);
     }
-    prlog("fix 1")
+    prlog("fix 3/testing nogen")
     auto hashkey1=101;
     if (sample::FRec *rec_obj = ind_hashkey_Find(hashkey1)) {
         prlog("I found "<<rec_obj->rec <<" with hashkey "<<hashkey1);

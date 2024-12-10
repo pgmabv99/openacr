@@ -190,6 +190,7 @@ dmmeta.thash  field:lib_sqlite.FDb.ind_conn  hashfld:lib_sqlite.FConn.name  uniq
 dmmeta.thash  field:mdbg.FDb.ind_cfg  hashfld:dev.Cfg.cfg  unique:Y  comment:""
 dmmeta.thash  field:orgfile.FDb.ind_filehash  hashfld:orgfile.FFilehash.filehash  unique:Y  comment:""
 dmmeta.thash  field:orgfile.FDb.ind_filename  hashfld:orgfile.FFilename.filename  unique:Y  comment:""
+dmmeta.thash  field:sample.FDb.ind_hashkey  hashfld:sample.FRec.hashkey  unique:Y  comment:""
 dmmeta.thash  field:samp_meng.FDb.ind_order  hashfld:samp_meng.FOrder.order  unique:Y  comment:""
 dmmeta.thash  field:samp_meng.FDb.ind_symbol  hashfld:samp_meng.FSymbol.symbol  unique:Y  comment:""
 dmmeta.thash  field:samp_meng.FDb.ind_user  hashfld:samp_meng.FUser.user  unique:Y  comment:""

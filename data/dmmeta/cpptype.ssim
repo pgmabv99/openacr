@@ -344,6 +344,7 @@ dmmeta.cpptype  ctype:report.abt  ctor:Y  dtor:Y  cheap_copy:N
 dmmeta.cpptype  ctype:report.acr_check  ctor:Y  dtor:Y  cheap_copy:N
 dmmeta.cpptype  ctype:report.gcache  ctor:Y  dtor:Y  cheap_copy:N
 dmmeta.cpptype  ctype:report.gcache_hitrate  ctor:Y  dtor:Y  cheap_copy:N
+dmmeta.cpptype  ctype:sample.Reckey  ctor:Y  dtor:Y  cheap_copy:N
 dmmeta.cpptype  ctype:samp_meng.CancelOrderMsg  ctor:Y  dtor:N  cheap_copy:N
 dmmeta.cpptype  ctype:samp_meng.CancelReqMsg  ctor:Y  dtor:N  cheap_copy:N
 dmmeta.cpptype  ctype:samp_meng.I64Price8  ctor:Y  dtor:N  cheap_copy:Y

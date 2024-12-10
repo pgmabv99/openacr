@@ -2029,6 +2029,33 @@ inline void command::samp_regx_proc_Init(command::samp_regx_proc& parent) {
     parent.timeout = i32(0);
     parent.status = i32(0);
 }
+inline command::sample::sample() {
+    command::sample_Init(*this);
+}
+
+
+// --- command.sample..Init
+// Set all fields to initial values.
+inline void command::sample_Init(command::sample& parent) {
+    parent.in = algo::strptr("data");
+}
+inline command::sample_proc::sample_proc() {
+    command::sample_proc_Init(*this);
+}
+
+inline command::sample_proc::~sample_proc() {
+    command::sample_proc_Uninit(*this);
+}
+
+
+// --- command.sample_proc..Init
+// Set all fields to initial values.
+inline void command::sample_proc_Init(command::sample_proc& parent) {
+    parent.path = algo::strptr("bin/sample");
+    parent.pid = pid_t(0);
+    parent.timeout = i32(0);
+    parent.status = i32(0);
+}
 
 // --- command.samp_regx_proc..Ctor
 inline  command::samp_regx_proc::samp_regx_proc() {
