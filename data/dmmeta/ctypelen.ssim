@@ -1107,7 +1107,7 @@ dmmeta.ctypelen  ctype:samp_meng.Symbol  len:8  alignment:1  padbytes:0  plainda
 dmmeta.ctypelen  ctype:samp_meng.TextMsg  len:2  alignment:1  padbytes:0  plaindata:N
 dmmeta.ctypelen  ctype:samp_regx.FDb  len:72  alignment:8  padbytes:7  plaindata:N
 dmmeta.ctypelen  ctype:sample.FDb  len:88  alignment:8  padbytes:7  plaindata:N
-dmmeta.ctypelen  ctype:sample.FRec  len:72  alignment:8  padbytes:8  plaindata:N
+dmmeta.ctypelen  ctype:sample.FRec  len:96  alignment:8  padbytes:10  plaindata:N
 dmmeta.ctypelen  ctype:sample.Reckey  len:40  alignment:8  padbytes:6  plaindata:Y
 dmmeta.ctypelen  ctype:sandbox.FDb  len:720  alignment:8  padbytes:7  plaindata:N
 dmmeta.ctypelen  ctype:sandbox.FSandbox  len:240  alignment:8  padbytes:11  plaindata:N

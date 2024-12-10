@@ -4638,6 +4638,7 @@ dmmeta.field  field:sample.FDb.ind_hashkey  arg:sample.FRec  reftype:Thash  dflt
 dmmeta.field  field:sample.FDb.bh_rec  arg:sample.FRec  reftype:Bheap  dflt:""  comment:""
 dmmeta.field  field:sample.FRec.rec  arg:sample.Reckey  reftype:Val  dflt:""  comment:""
 dmmeta.field  field:sample.FRec.hashkey  arg:i32  reftype:Val  dflt:""  comment:""
+dmmeta.field  field:sample.FRec.data  arg:algo.Smallstr20  reftype:Val  dflt:""  comment:""
 dmmeta.field  field:sample.Reckey.key1  arg:i32  reftype:Val  dflt:""  comment:""
 dmmeta.field  field:sample.Reckey.key2  arg:double  reftype:Val  dflt:""  comment:""
 dmmeta.field  field:sample.Reckey.key3  arg:algo.Smallstr20  reftype:Val  dflt:""  comment:""

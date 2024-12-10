@@ -301,11 +301,12 @@ void                 Reckey_Print(sample::Reckey& row, algo::cstring& str) __att
 // global access: ind_hashkey (Thash)
 // global access: bh_rec (Bheap)
 struct FRec { // sample.FRec
-    sample::FRec*    rec_next;           // Pointer to next free element int tpool
-    sample::FRec*    ind_hashkey_next;   // hash next
-    i32              bh_rec_idx;         // index in heap; -1 means not-in-heap
-    sample::Reckey   rec;                //
-    i32              hashkey;            //   0
+    sample::FRec*      rec_next;           // Pointer to next free element int tpool
+    sample::FRec*      ind_hashkey_next;   // hash next
+    i32                bh_rec_idx;         // index in heap; -1 means not-in-heap
+    sample::Reckey     rec;                //
+    i32                hashkey;            //   0
+    algo::Smallstr20   data;               //
 private:
     friend sample::FRec&        rec_Alloc() __attribute__((__warn_unused_result__, nothrow));
     friend sample::FRec*        rec_AllocMaybe() __attribute__((__warn_unused_result__, nothrow));

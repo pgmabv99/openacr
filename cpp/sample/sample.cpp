@@ -28,17 +28,20 @@ void sample::CreateRecord(int i) {
     // heap key
     rec_obj.rec.key1=i;
     rec_obj.rec.key2=i;
-    cstring key3 ;
-    key3 << "rec_" << i;
-    rec_obj.rec.key3=key3;
+    cstring tmp ;
+    tmp << "key3_" << i;
+    rec_obj.rec.key3=tmp;
     // separate hash key
     rec_obj.hashkey = i+100;
+    cstring tmp2;
+    tmp2<< " data_" << i;
+    rec_obj.data = tmp2;
     rec_XrefMaybe(rec_obj);
     if (!rec_XrefMaybe(rec_obj)) {
         prlog("did NOT cross reference "<<rec_obj.rec);
         rec_Delete(rec_obj);
     }else{
-        prlog("added  and cross referenced "<<rec_obj.rec);
+        prlog("added  and cross referenced "<<rec_obj.rec << " data " << rec_obj.data);
     }
 }
 
@@ -70,7 +73,7 @@ void sample::Main() {
     for (int i=0; i<5; i++) {
         CreateRecord(i);
     }
-    prlog("fix 3/testing nogen")
+    prlog("fix 4/testing nogen")
     auto hashkey1=101;
     if (sample::FRec *rec_obj = ind_hashkey_Find(hashkey1)) {
         prlog("I found "<<rec_obj->rec <<" with hashkey "<<hashkey1);
