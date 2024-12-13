@@ -425,6 +425,17 @@ void myns::tcp_read(myns::Client &client_obj)
 
 }
 
+// void myns::In_NewOrderReqMsg(myns::NewOrderReqMsg &msg)
+// {
+//     algo::Smallstr50 part_key;
+//     part_key = msg.part_key;
+//     auto amt = msg.amt;
+//     prlog("part_key: " << part_key << ", amt: " << amt);
+
+//     // add the order
+//     // auto retval = myns::add_order(algo::Smallstr50(part_key), amt);
+// }
+
 void myns::trm_listen()
 {
     _db.terminal.fildes = algo::Fildes(0);
@@ -522,7 +533,7 @@ void myns::Main()
 void myns::terminate_mcb()
 
 {
-    prlog("==done 35");
+    prlog("==done 37");
     // delete mcb;
     exit(EXIT_SUCCESS);
 }

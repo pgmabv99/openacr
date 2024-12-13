@@ -134,6 +134,8 @@ const char *dmmeta_Ns_ns_lib_prot     = "lib_prot";
 const char *dmmeta_Ns_ns_lib_sql      = "lib_sql";
 const char *dmmeta_Ns_ns_lib_sqlite   = "lib_sqlite";
 const char *dmmeta_Ns_ns_mdbg         = "mdbg";
+const char *dmmeta_Ns_ns_myns         = "myns";
+const char *dmmeta_Ns_ns_mynsdb       = "mynsdb";
 const char *dmmeta_Ns_ns_mysql2ssim   = "mysql2ssim";
 const char *dmmeta_Ns_ns_orgfile      = "orgfile";
 const char *dmmeta_Ns_ns_report       = "report";
@@ -458,6 +460,7 @@ const char *dmmeta_Ssimfile_ssimfile_gclidb_mrjob           = "gclidb.mrjob";
 const char *dmmeta_Ssimfile_ssimfile_gclidb_mrnote    = "gclidb.mrnote";
 const char *dmmeta_Ssimfile_ssimfile_gclidb_project   = "gclidb.project";
 const char *dmmeta_Ssimfile_ssimfile_gclidb_user      = "gclidb.user";
+const char *dmmeta_Ssimfile_ssimfile_mynsdb_part      = "mynsdb.part";
 
 // compile-time string constants for dmmeta.Steptype.steptype
 const char *dmmeta_Steptype_steptype_Callback        = "Callback";

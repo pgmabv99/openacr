@@ -256,6 +256,7 @@ dmmeta.finput  field:lib_fm.FDb.alm_objtype  extrn:N  update:N  strict:Y  commen
 dmmeta.finput  field:lib_sqlite.FDb.substr  extrn:N  update:N  strict:Y  comment:""
 dmmeta.finput  field:mdbg.FDb.builddir  extrn:N  update:N  strict:Y  comment:""
 dmmeta.finput  field:mdbg.FDb.cfg  extrn:N  update:N  strict:Y  comment:""
+dmmeta.finput  field:myns.FDb.part  extrn:N  update:N  strict:Y  comment:""
 dmmeta.finput  field:orgfile.FDb.timefmt  extrn:N  update:N  strict:Y  comment:""
 dmmeta.finput  field:sandbox.FDb.sandbox  extrn:N  update:N  strict:Y  comment:""
 dmmeta.finput  field:sandbox.FDb.sbpath  extrn:N  update:N  strict:Y  comment:""

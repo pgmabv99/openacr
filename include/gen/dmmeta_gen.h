@@ -340,6 +340,8 @@ extern const char *  dmmeta_Ns_ns_lib_prot;       // lib_prot        fconst:dmme
 extern const char *  dmmeta_Ns_ns_lib_sql;        // lib_sql         fconst:dmmeta.Ns.ns/lib_sql
 extern const char *  dmmeta_Ns_ns_lib_sqlite;     // lib_sqlite      fconst:dmmeta.Ns.ns/lib_sqlite
 extern const char *  dmmeta_Ns_ns_mdbg;           // mdbg            fconst:dmmeta.Ns.ns/mdbg
+extern const char *  dmmeta_Ns_ns_myns;           // myns            fconst:dmmeta.Ns.ns/myns
+extern const char *  dmmeta_Ns_ns_mynsdb;         // mynsdb          fconst:dmmeta.Ns.ns/mynsdb
 extern const char *  dmmeta_Ns_ns_mysql2ssim;     // mysql2ssim      fconst:dmmeta.Ns.ns/mysql2ssim
 extern const char *  dmmeta_Ns_ns_orgfile;        // orgfile         fconst:dmmeta.Ns.ns/orgfile
 extern const char *  dmmeta_Ns_ns_report;         // report          fconst:dmmeta.Ns.ns/report
@@ -675,6 +677,7 @@ extern const char *  dmmeta_Ssimfile_ssimfile_gclidb_mrjob;                // gc
 extern const char *  dmmeta_Ssimfile_ssimfile_gclidb_mrnote;               // gclidb.mrnote                fconst:dmmeta.Ssimfile.ssimfile/gclidb.mrnote
 extern const char *  dmmeta_Ssimfile_ssimfile_gclidb_project;              // gclidb.project               fconst:dmmeta.Ssimfile.ssimfile/gclidb.project
 extern const char *  dmmeta_Ssimfile_ssimfile_gclidb_user;                 // gclidb.user                  fconst:dmmeta.Ssimfile.ssimfile/gclidb.user
+extern const char *  dmmeta_Ssimfile_ssimfile_mynsdb_part;                 // mynsdb.part                  fconst:dmmeta.Ssimfile.ssimfile/mynsdb.part
 extern const char *  dmmeta_Steptype_steptype_Callback;        // Callback         fconst:dmmeta.Steptype.steptype/Callback
 extern const char *  dmmeta_Steptype_steptype_Extern;          // Extern           fconst:dmmeta.Steptype.steptype/Extern
 extern const char *  dmmeta_Steptype_steptype_Inline;          // Inline           fconst:dmmeta.Steptype.steptype/Inline

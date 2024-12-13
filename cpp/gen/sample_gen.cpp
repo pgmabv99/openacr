@@ -75,22 +75,22 @@ namespace sample { // gen:ns_print_proto
     // func:sample.FDb.bh_rec.Upheap
     static int           bh_rec_Upheap(sample::FRec& row, int idx) __attribute__((nothrow));
     // func:sample.FDb.bh_rec.ElemLt
-    static bool          bh_rec_ElemLt(sample::FRec &a, sample::FRec &b) __attribute__((nothrow));
+    inline static bool   bh_rec_ElemLt(sample::FRec &a, sample::FRec &b) __attribute__((nothrow));
     // func:sample.FDb.bh_rec_curs.Add
     static void          _db_bh_rec_curs_Add(_db_bh_rec_curs &curs, sample::FRec& row);
     // Update cycles count from previous clock capture
     // func:sample.FDb.bh_rec.UpdateCycles
-    static void          bh_rec_UpdateCycles() __attribute__((nothrow));
+    inline static void   bh_rec_UpdateCycles() __attribute__((nothrow));
     // func:sample.FDb.bh_rec.Call
-    static void          bh_rec_Call() __attribute__((nothrow));
+    inline static void   bh_rec_Call() __attribute__((nothrow));
     // find trace by row id (used to implement reflection)
     // func:sample.FDb.trace.RowidFind
     static algo::ImrowPtr trace_RowidFind(int t) __attribute__((nothrow));
     // Function return 1
     // func:sample.FDb.trace.N
-    static i32           trace_N() __attribute__((__warn_unused_result__, nothrow, pure));
+    inline static i32    trace_N() __attribute__((__warn_unused_result__, nothrow, pure));
     // func:sample...SizeCheck
-    static void          SizeCheck();
+    inline static void   SizeCheck();
 } // gen:ns_print_proto
 
 // --- sample.trace..Print

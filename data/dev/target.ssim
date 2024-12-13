@@ -40,6 +40,7 @@ dev.target  target:lib_prot
 dev.target  target:lib_sql
 dev.target  target:lib_sqlite
 dev.target  target:mdbg
+dev.target  target:myns
 dev.target  target:mysql2ssim
 dev.target  target:orgfile
 dev.target  target:samp_meng

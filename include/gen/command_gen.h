@@ -469,6 +469,8 @@ namespace command { struct gcli; }
 namespace command { struct gcli_proc; }
 namespace command { struct mdbg; }
 namespace command { struct mdbg_proc; }
+namespace command { struct myns; }
+namespace command { struct myns_proc; }
 namespace command { struct mysql2ssim; }
 namespace command { struct mysql2ssim_proc; }
 namespace command { struct orgfile; }
@@ -4609,6 +4611,89 @@ inline void          mdbg_proc_Init(command::mdbg_proc& parent);
 // func:command.mdbg_proc..Uninit
 void                 mdbg_proc_Uninit(command::mdbg_proc& parent) __attribute__((nothrow));
 
+// --- command.myns
+// access: command.myns_proc.myns (Exec)
+struct myns { // command.myns
+    algo::cstring   in;   //   "data"  Input directory or filename, - for stdin
+    // func:command.myns..Ctor
+    inline               myns() __attribute__((nothrow));
+};
+
+// func:command.myns..ReadFieldMaybe
+bool                 myns_ReadFieldMaybe(command::myns& parent, algo::strptr field, algo::strptr strval) __attribute__((nothrow));
+// Read fields of command::myns from attributes of ascii tuple TUPLE
+// func:command.myns..ReadTupleMaybe
+bool                 myns_ReadTupleMaybe(command::myns &parent, algo::Tuple &tuple) __attribute__((nothrow));
+// Set all fields to initial values.
+// func:command.myns..Init
+inline void          myns_Init(command::myns& parent);
+// Convenience function that returns a full command line
+// Assume command is in a directory called bin
+// func:command.myns..ToCmdline
+tempstr              myns_ToCmdline(command::myns& row) __attribute__((nothrow));
+// print string representation of ROW to string STR
+// cfmt:command.myns.Argv  printfmt:Tuple
+// func:command.myns..PrintArgv
+void                 myns_PrintArgv(command::myns& row, algo::cstring& str) __attribute__((nothrow));
+// Used with command lines
+// Return # of command-line arguments that must follow this argument
+// If FIELD is invalid, return -1
+// func:command.myns..NArgs
+i32                  myns_NArgs(command::FieldId field, algo::strptr& out_dflt, bool* out_anon) __attribute__((nothrow));
+
+// --- command.myns_proc
+struct myns_proc { // command.myns_proc: Subprocess: create program and inherit from db
+    algo::cstring   path;      //   "bin/myns"  path for executable
+    command::myns   cmd;       // command line for child process
+    algo::cstring   fstdin;    // redirect for stdin
+    algo::cstring   fstdout;   // redirect for stdout
+    algo::cstring   fstderr;   // redirect for stderr
+    pid_t           pid;       //   0  pid of running child process
+    i32             timeout;   //   0  optional timeout for child process
+    i32             status;    //   0  last exit status of child process
+    // func:command.myns_proc..Ctor
+    inline               myns_proc() __attribute__((nothrow));
+    // func:command.myns_proc..Dtor
+    inline               ~myns_proc() __attribute__((nothrow));
+};
+
+// Start subprocess
+// If subprocess already running, do nothing. Otherwise, start it
+// func:command.myns_proc.myns.Start
+int                  myns_Start(command::myns_proc& parent) __attribute__((nothrow));
+// Start subprocess & Read output
+// func:command.myns_proc.myns.StartRead
+algo::Fildes         myns_StartRead(command::myns_proc& parent, algo_lib::FFildes &read) __attribute__((nothrow));
+// Kill subprocess and wait
+// func:command.myns_proc.myns.Kill
+void                 myns_Kill(command::myns_proc& parent);
+// Wait for subprocess to return
+// func:command.myns_proc.myns.Wait
+void                 myns_Wait(command::myns_proc& parent) __attribute__((nothrow));
+// Start + Wait
+// Execute subprocess and return exit code
+// func:command.myns_proc.myns.Exec
+int                  myns_Exec(command::myns_proc& parent) __attribute__((nothrow));
+// Start + Wait, throw exception on error
+// Execute subprocess; throw human-readable exception on error
+// func:command.myns_proc.myns.ExecX
+void                 myns_ExecX(command::myns_proc& parent);
+// Call execv()
+// Call execv with specified parameters
+// func:command.myns_proc.myns.Execv
+int                  myns_Execv(command::myns_proc& parent) __attribute__((nothrow));
+// func:command.myns_proc.myns.ToCmdline
+algo::tempstr        myns_ToCmdline(command::myns_proc& parent) __attribute__((nothrow));
+// Form array from the command line
+// func:command.myns_proc.myns.ToArgv
+void                 myns_ToArgv(command::myns_proc& parent, algo::StringAry& args) __attribute__((nothrow));
+
+// Set all fields to initial values.
+// func:command.myns_proc..Init
+inline void          myns_proc_Init(command::myns_proc& parent);
+// func:command.myns_proc..Uninit
+void                 myns_proc_Uninit(command::myns_proc& parent) __attribute__((nothrow));
+
 // --- command.mysql2ssim
 // access: command.mysql2ssim_proc.mysql2ssim (Exec)
 struct mysql2ssim { // command.mysql2ssim
@@ -5001,7 +5086,8 @@ void                 samp_regx_proc_Uninit(command::samp_regx_proc& parent) __at
 // access: command.sample_proc.sample (Exec)
 struct sample { // command.sample
     algo::cstring   in;   //   "data"  Input directory or filename, - for stdin
-    sample();
+    // func:command.sample..Ctor
+    inline               sample() __attribute__((nothrow));
 };
 
 // func:command.sample..ReadFieldMaybe
@@ -5011,7 +5097,7 @@ bool                 sample_ReadFieldMaybe(command::sample& parent, algo::strptr
 bool                 sample_ReadTupleMaybe(command::sample &parent, algo::Tuple &tuple) __attribute__((nothrow));
 // Set all fields to initial values.
 // func:command.sample..Init
-void                 sample_Init(command::sample& parent);
+inline void          sample_Init(command::sample& parent);
 // Convenience function that returns a full command line
 // Assume command is in a directory called bin
 // func:command.sample..ToCmdline
@@ -5036,12 +5122,10 @@ struct sample_proc { // command.sample_proc: Subprocess:
     pid_t             pid;       //   0  pid of running child process
     i32               timeout;   //   0  optional timeout for child process
     i32               status;    //   0  last exit status of child process
-    sample_proc();
-    ~sample_proc();
-private:
-    // reftype Exec of command.sample_proc.sample prohibits copy
-    sample_proc(const sample_proc&){ /*disallow copy constructor */}
-    void operator =(const sample_proc&){ /*disallow direct assignment */}
+    // func:command.sample_proc..Ctor
+    inline               sample_proc() __attribute__((nothrow));
+    // func:command.sample_proc..Dtor
+    inline               ~sample_proc() __attribute__((nothrow));
 };
 
 // Start subprocess
@@ -5077,7 +5161,7 @@ void                 sample_ToArgv(command::sample_proc& parent, algo::StringAry
 
 // Set all fields to initial values.
 // func:command.sample_proc..Init
-void                 sample_proc_Init(command::sample_proc& parent);
+inline void          sample_proc_Init(command::sample_proc& parent);
 // func:command.sample_proc..Uninit
 void                 sample_proc_Uninit(command::sample_proc& parent) __attribute__((nothrow));
 

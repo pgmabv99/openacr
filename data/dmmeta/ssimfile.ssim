@@ -224,3 +224,4 @@ dmmeta.ssimfile  ssimfile:gclidb.mrjob  ctype:gclidb.Mrjob
 dmmeta.ssimfile  ssimfile:gclidb.mrnote  ctype:gclidb.Mrnote
 dmmeta.ssimfile  ssimfile:gclidb.project  ctype:gclidb.Project
 dmmeta.ssimfile  ssimfile:gclidb.user  ctype:gclidb.User
+dmmeta.ssimfile  ssimfile:mynsdb.part  ctype:mynsdb.Part

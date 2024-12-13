@@ -27,6 +27,7 @@ dmmeta.msgtype  ctype:atf_amc.Seqmsg  type:0x0905
 dmmeta.msgtype  ctype:atf_amc.Text  type:0x0412
 dmmeta.msgtype  ctype:atf_amc.VarlenMsg  type:0x1000
 dmmeta.msgtype  ctype:fm.AlarmMsg  type:17
+dmmeta.msgtype  ctype:myns.NewOrderReqMsg  type:66
 dmmeta.msgtype  ctype:samp_meng.CancelOrderMsg  type:3
 dmmeta.msgtype  ctype:samp_meng.CancelReqMsg  type:11
 dmmeta.msgtype  ctype:samp_meng.MassCancelReqMsg  type:12

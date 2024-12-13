@@ -754,6 +754,7 @@ dmmeta.ctypelen  ctype:command.bash_proc  len:96  alignment:8  padbytes:4  plain
 dmmeta.ctypelen  ctype:command.gcache  len:72  alignment:8  padbytes:7  plaindata:N
 dmmeta.ctypelen  ctype:command.gcli  len:352  alignment:8  padbytes:24  plaindata:N
 dmmeta.ctypelen  ctype:command.mdbg  len:160  alignment:8  padbytes:17  plaindata:N
+dmmeta.ctypelen  ctype:command.myns  len:16  alignment:8  padbytes:0  plaindata:N
 dmmeta.ctypelen  ctype:command.mysql2ssim  len:72  alignment:8  padbytes:19  plaindata:N
 dmmeta.ctypelen  ctype:command.orgfile  len:144  alignment:8  padbytes:6  plaindata:N
 dmmeta.ctypelen  ctype:command.samp_meng  len:16  alignment:8  padbytes:0  plaindata:N
@@ -1067,6 +1068,13 @@ dmmeta.ctypelen  ctype:lib_sqlite.VtabCurs  len:8328  alignment:8  padbytes:3  p
 dmmeta.ctypelen  ctype:mdbg.FBuilddir  len:205  alignment:1  padbytes:0  plaindata:Y
 dmmeta.ctypelen  ctype:mdbg.FCfg  len:240  alignment:8  padbytes:5  plaindata:N
 dmmeta.ctypelen  ctype:mdbg.FDb  len:1032  alignment:8  padbytes:10  plaindata:N
+dmmeta.ctypelen  ctype:myns.Client  len:160  alignment:8  padbytes:8  plaindata:N
+dmmeta.ctypelen  ctype:myns.FDb  len:520  alignment:8  padbytes:26  plaindata:N
+dmmeta.ctypelen  ctype:myns.FPart  len:264  alignment:8  padbytes:8  plaindata:N
+dmmeta.ctypelen  ctype:myns.MsgHeader  len:2  alignment:1  padbytes:0  plaindata:Y
+dmmeta.ctypelen  ctype:myns.NewOrderReqMsg  len:58  alignment:1  padbytes:0  plaindata:Y
+dmmeta.ctypelen  ctype:myns.Order  len:120  alignment:8  padbytes:7  plaindata:N
+dmmeta.ctypelen  ctype:mynsdb.Part  len:208  alignment:4  padbytes:0  plaindata:Y
 dmmeta.ctypelen  ctype:mysql2ssim.FDb  len:136  alignment:8  padbytes:7  plaindata:N
 dmmeta.ctypelen  ctype:mysql2ssim.FTobltin  len:24  alignment:8  padbytes:6  plaindata:N
 dmmeta.ctypelen  ctype:orgfile.FDb  len:720  alignment:8  padbytes:7  plaindata:N

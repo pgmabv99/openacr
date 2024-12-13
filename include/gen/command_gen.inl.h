@@ -1904,6 +1904,36 @@ inline  command::mdbg_proc::~mdbg_proc() {
     command::mdbg_proc_Uninit(*this);
 }
 
+// --- command.myns..Init
+// Set all fields to initial values.
+inline void command::myns_Init(command::myns& parent) {
+    parent.in = algo::strptr("data");
+}
+
+// --- command.myns..Ctor
+inline  command::myns::myns() {
+    command::myns_Init(*this);
+}
+
+// --- command.myns_proc..Init
+// Set all fields to initial values.
+inline void command::myns_proc_Init(command::myns_proc& parent) {
+    parent.path = algo::strptr("bin/myns");
+    parent.pid = pid_t(0);
+    parent.timeout = i32(0);
+    parent.status = i32(0);
+}
+
+// --- command.myns_proc..Ctor
+inline  command::myns_proc::myns_proc() {
+    command::myns_proc_Init(*this);
+}
+
+// --- command.myns_proc..Dtor
+inline  command::myns_proc::~myns_proc() {
+    command::myns_proc_Uninit(*this);
+}
+
 // --- command.mysql2ssim..Init
 // Set all fields to initial values.
 inline void command::mysql2ssim_Init(command::mysql2ssim& parent) {
@@ -2029,24 +2059,27 @@ inline void command::samp_regx_proc_Init(command::samp_regx_proc& parent) {
     parent.timeout = i32(0);
     parent.status = i32(0);
 }
-inline command::sample::sample() {
-    command::sample_Init(*this);
+
+// --- command.samp_regx_proc..Ctor
+inline  command::samp_regx_proc::samp_regx_proc() {
+    command::samp_regx_proc_Init(*this);
 }
 
+// --- command.samp_regx_proc..Dtor
+inline  command::samp_regx_proc::~samp_regx_proc() {
+    command::samp_regx_proc_Uninit(*this);
+}
 
 // --- command.sample..Init
 // Set all fields to initial values.
 inline void command::sample_Init(command::sample& parent) {
     parent.in = algo::strptr("data");
 }
-inline command::sample_proc::sample_proc() {
-    command::sample_proc_Init(*this);
-}
 
-inline command::sample_proc::~sample_proc() {
-    command::sample_proc_Uninit(*this);
+// --- command.sample..Ctor
+inline  command::sample::sample() {
+    command::sample_Init(*this);
 }
-
 
 // --- command.sample_proc..Init
 // Set all fields to initial values.
@@ -2057,14 +2090,14 @@ inline void command::sample_proc_Init(command::sample_proc& parent) {
     parent.status = i32(0);
 }
 
-// --- command.samp_regx_proc..Ctor
-inline  command::samp_regx_proc::samp_regx_proc() {
-    command::samp_regx_proc_Init(*this);
+// --- command.sample_proc..Ctor
+inline  command::sample_proc::sample_proc() {
+    command::sample_proc_Init(*this);
 }
 
-// --- command.samp_regx_proc..Dtor
-inline  command::samp_regx_proc::~samp_regx_proc() {
-    command::samp_regx_proc_Uninit(*this);
+// --- command.sample_proc..Dtor
+inline  command::sample_proc::~sample_proc() {
+    command::sample_proc_Uninit(*this);
 }
 
 // --- command.sandbox.cmd.EmptyQ

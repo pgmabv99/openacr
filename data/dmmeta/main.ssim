@@ -26,6 +26,7 @@ dmmeta.main  ns:bash2html  ismodule:N
 dmmeta.main  ns:gcache  ismodule:N
 dmmeta.main  ns:gcli  ismodule:N
 dmmeta.main  ns:mdbg  ismodule:N
+dmmeta.main  ns:myns  ismodule:N
 dmmeta.main  ns:mysql2ssim  ismodule:N
 dmmeta.main  ns:orgfile  ismodule:N
 dmmeta.main  ns:samp_meng  ismodule:N

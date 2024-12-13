@@ -1,3 +1,5 @@
 dmmeta.fdelay  fstep:lib_ams.FDb.cd_stream_hb  delay:1.000000000  scale:Y  comment:""
 dmmeta.fdelay  fstep:lib_ams.FDb.zd_flush  delay:0.100000000  scale:Y  comment:""
+dmmeta.fdelay  fstep:myns.FDb.sched1  delay:5  scale:N  comment:""
+dmmeta.fdelay  fstep:myns.FDb.zd_order  delay:5  scale:Y  comment:""
 dmmeta.fdelay  fstep:sample.FDb.bh_rec  delay:1.0  scale:N  comment:""

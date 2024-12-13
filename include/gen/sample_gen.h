@@ -57,7 +57,8 @@ namespace sample { // gen:ns_print_struct
 // --- sample.trace
 #pragma pack(push,1)
 struct trace { // sample.trace
-    trace();
+    // func:sample.trace..Ctor
+    inline               trace() __attribute__((nothrow));
 };
 #pragma pack(pop)
 
@@ -160,7 +161,7 @@ bool                 rec_XrefMaybe(sample::FRec &row);
 
 // Return true if hash is empty
 // func:sample.FDb.ind_hashkey.EmptyQ
-bool                 ind_hashkey_EmptyQ() __attribute__((nothrow));
+inline bool          ind_hashkey_EmptyQ() __attribute__((nothrow));
 // Find row by key. Return NULL if not found.
 // func:sample.FDb.ind_hashkey.Find
 sample::FRec*        ind_hashkey_Find(i32 key) __attribute__((__warn_unused_result__, nothrow));
@@ -169,7 +170,7 @@ sample::FRec*        ind_hashkey_Find(i32 key) __attribute__((__warn_unused_resu
 sample::FRec&        ind_hashkey_FindX(i32 key);
 // Return number of items in the hash
 // func:sample.FDb.ind_hashkey.N
-i32                  ind_hashkey_N() __attribute__((__warn_unused_result__, nothrow, pure));
+inline i32           ind_hashkey_N() __attribute__((__warn_unused_result__, nothrow, pure));
 // Insert row into hash table. Return true if row is reachable through the hash after the function completes.
 // func:sample.FDb.ind_hashkey.InsertMaybe
 bool                 ind_hashkey_InsertMaybe(sample::FRec& row) __attribute__((nothrow));
@@ -185,19 +186,19 @@ void                 ind_hashkey_Reserve(int n) __attribute__((nothrow));
 void                 bh_rec_Dealloc() __attribute__((nothrow));
 // Return true if index is empty
 // func:sample.FDb.bh_rec.EmptyQ
-bool                 bh_rec_EmptyQ() __attribute__((nothrow));
+inline bool          bh_rec_EmptyQ() __attribute__((nothrow));
 // If index empty, return NULL. Otherwise return pointer to first element in index
 // func:sample.FDb.bh_rec.First
-sample::FRec*        bh_rec_First() __attribute__((__warn_unused_result__, nothrow, pure));
+inline sample::FRec* bh_rec_First() __attribute__((__warn_unused_result__, nothrow, pure));
 // Return true if row is in index, false otherwise
 // func:sample.FDb.bh_rec.InBheapQ
-bool                 bh_rec_InBheapQ(sample::FRec& row) __attribute__((__warn_unused_result__, nothrow));
+inline bool          bh_rec_InBheapQ(sample::FRec& row) __attribute__((__warn_unused_result__, nothrow));
 // Insert row. Row must not already be in index. If row is already in index, do nothing.
 // func:sample.FDb.bh_rec.Insert
 void                 bh_rec_Insert(sample::FRec& row) __attribute__((nothrow));
 // Return number of items in the heap
 // func:sample.FDb.bh_rec.N
-i32                  bh_rec_N() __attribute__((__warn_unused_result__, nothrow, pure));
+inline i32           bh_rec_N() __attribute__((__warn_unused_result__, nothrow, pure));
 // If row is in heap, update its position. If row is not in heap, insert it.
 // Return new position of item in the heap (0=top)
 // If first item of the is changed, update fstep:sample.FDb.bh_rec
@@ -244,10 +245,10 @@ void                 _db_bh_rec_curs_Reset(_db_bh_rec_curs &curs, sample::FDb &p
 void                 _db_bh_rec_curs_Next(_db_bh_rec_curs &curs);
 // Access current element. If not more elements, return NULL
 // func:sample.FDb.bh_rec_curs.Access
-sample::FRec&        _db_bh_rec_curs_Access(_db_bh_rec_curs &curs) __attribute__((nothrow));
+inline sample::FRec& _db_bh_rec_curs_Access(_db_bh_rec_curs &curs) __attribute__((nothrow));
 // Return true if Access() will return non-NULL.
 // func:sample.FDb.bh_rec_curs.ValidQ
-bool                 _db_bh_rec_curs_ValidQ(_db_bh_rec_curs &curs) __attribute__((nothrow));
+inline bool          _db_bh_rec_curs_ValidQ(_db_bh_rec_curs &curs) __attribute__((nothrow));
 // Set all fields to initial values.
 // func:sample.FDb..Init
 void                 FDb_Init();
@@ -259,20 +260,26 @@ struct Reckey { // sample.Reckey
     i32                key1;   //   0
     double             key2;   //   0.0
     algo::Smallstr20   key3;   //
-    explicit Reckey(i32                            in_key1
-        ,double                         in_key2
-        ,const algo::strptr&            in_key3);
-    bool operator ==(const sample::Reckey &rhs) const;
-    bool operator !=(const sample::Reckey &rhs) const;
-    bool operator <(const sample::Reckey &rhs) const;
-    bool operator >(const sample::Reckey &rhs) const;
-    bool operator <=(const sample::Reckey &rhs) const;
-    bool operator >=(const sample::Reckey &rhs) const;
-    Reckey();
+    // func:sample.Reckey..EqOp
+    inline bool          operator ==(const sample::Reckey &rhs) const __attribute__((nothrow));
+    // func:sample.Reckey..NeOp
+    inline bool          operator !=(const sample::Reckey &rhs) const __attribute__((nothrow));
+    // func:sample.Reckey..LtOp
+    inline bool          operator <(const sample::Reckey &rhs) const __attribute__((nothrow));
+    // func:sample.Reckey..GtOp
+    inline bool          operator >(const sample::Reckey &rhs) const __attribute__((nothrow));
+    // func:sample.Reckey..LeOp
+    inline bool          operator <=(const sample::Reckey &rhs) const __attribute__((nothrow));
+    // func:sample.Reckey..GeOp
+    inline bool          operator >=(const sample::Reckey &rhs) const __attribute__((nothrow));
+    // func:sample.Reckey..Ctor
+    inline               Reckey() __attribute__((nothrow));
+    // func:sample.Reckey..FieldwiseCtor
+    explicit inline               Reckey(i32 in_key1, double in_key2, const algo::strptr& in_key3) __attribute__((nothrow));
 };
 
 // func:sample.Reckey..Hash
-u32                  Reckey_Hash(u32 prev, const sample::Reckey & rhs) __attribute__((nothrow));
+inline u32           Reckey_Hash(u32 prev, const sample::Reckey& rhs) __attribute__((nothrow));
 // func:sample.Reckey..ReadFieldMaybe
 bool                 Reckey_ReadFieldMaybe(sample::Reckey& parent, algo::strptr field, algo::strptr strval) __attribute__((nothrow));
 // Read fields of sample::Reckey from an ascii string.
@@ -280,17 +287,17 @@ bool                 Reckey_ReadFieldMaybe(sample::Reckey& parent, algo::strptr 
 // func:sample.Reckey..ReadStrptrMaybe
 bool                 Reckey_ReadStrptrMaybe(sample::Reckey &parent, algo::strptr in_str) __attribute__((nothrow));
 // func:sample.Reckey..Lt
-bool                 Reckey_Lt(sample::Reckey& lhs, sample::Reckey& rhs) __attribute__((nothrow));
+inline bool          Reckey_Lt(sample::Reckey& lhs, sample::Reckey& rhs) __attribute__((nothrow));
 // func:sample.Reckey..Cmp
-i32                  Reckey_Cmp(sample::Reckey& lhs, sample::Reckey& rhs) __attribute__((nothrow));
+inline i32           Reckey_Cmp(sample::Reckey& lhs, sample::Reckey& rhs) __attribute__((nothrow));
 // Set all fields to initial values.
 // func:sample.Reckey..Init
-void                 Reckey_Init(sample::Reckey& parent);
+inline void          Reckey_Init(sample::Reckey& parent);
 // func:sample.Reckey..Eq
-bool                 Reckey_Eq(sample::Reckey& lhs, sample::Reckey& rhs) __attribute__((nothrow));
+inline bool          Reckey_Eq(sample::Reckey& lhs, sample::Reckey& rhs) __attribute__((nothrow));
 // Set value. Return true if new value is different from old value.
 // func:sample.Reckey..Update
-bool                 Reckey_Update(sample::Reckey &lhs, sample::Reckey& rhs) __attribute__((nothrow));
+inline bool          Reckey_Update(sample::Reckey &lhs, sample::Reckey& rhs) __attribute__((nothrow));
 // print string representation of ROW to string STR
 // cfmt:sample.Reckey.String  printfmt:Sep
 // func:sample.Reckey..Print
@@ -298,8 +305,8 @@ void                 Reckey_Print(sample::Reckey& row, algo::cstring& str) __att
 
 // --- sample.FRec
 // create: sample.FDb.rec (Tpool)
-// global access: ind_hashkey (Thash)
-// global access: bh_rec (Bheap)
+// global access: ind_hashkey (Thash, hash field hashkey)
+// global access: bh_rec (Bheap, sort field rec)
 struct FRec { // sample.FRec
     sample::FRec*      rec_next;           // Pointer to next free element int tpool
     sample::FRec*      ind_hashkey_next;   // hash next
@@ -307,26 +314,30 @@ struct FRec { // sample.FRec
     sample::Reckey     rec;                //
     i32                hashkey;            //   0
     algo::Smallstr20   data;               //
+    // func:sample.FRec..AssignOp
+    inline sample::FRec& operator =(const sample::FRec &rhs) = delete;
+    // func:sample.FRec..CopyCtor
+    inline               FRec(const sample::FRec &rhs) = delete;
 private:
+    // func:sample.FRec..Ctor
+    inline               FRec() __attribute__((nothrow));
+    // func:sample.FRec..Dtor
+    inline               ~FRec() __attribute__((nothrow));
     friend sample::FRec&        rec_Alloc() __attribute__((__warn_unused_result__, nothrow));
     friend sample::FRec*        rec_AllocMaybe() __attribute__((__warn_unused_result__, nothrow));
     friend void                 rec_Delete(sample::FRec &row) __attribute__((nothrow));
-    FRec();
-    ~FRec();
-    FRec(const FRec&){ /*disallow copy constructor */}
-    void operator =(const FRec&){ /*disallow direct assignment */}
 };
 
 // Compare two fields. Comparison is anti-symmetric: if a>b, then !(b>a).
 // func:sample.FRec.rec.Lt
-bool                 rec_Lt(sample::FRec& rec, sample::FRec &rhs) __attribute__((nothrow));
+inline bool          rec_Lt(sample::FRec& rec, sample::FRec &rhs) __attribute__((nothrow));
 // Compare two fields.
 // func:sample.FRec.rec.Cmp
-i32                  rec_Cmp(sample::FRec& rec, sample::FRec &rhs) __attribute__((nothrow));
+inline i32           rec_Cmp(sample::FRec& rec, sample::FRec &rhs) __attribute__((nothrow));
 
 // Set all fields to initial values.
 // func:sample.FRec..Init
-void                 FRec_Init(sample::FRec& rec);
+inline void          FRec_Init(sample::FRec& rec);
 // func:sample.FRec..Uninit
 void                 FRec_Uninit(sample::FRec& rec) __attribute__((nothrow));
 
@@ -334,19 +345,23 @@ void                 FRec_Uninit(sample::FRec& rec) __attribute__((nothrow));
 #pragma pack(push,1)
 struct FieldId { // sample.FieldId: Field read helper
     i32   value;   //   -1
-    inline operator sample_FieldIdEnum() const;
-    explicit FieldId(i32                            in_value);
-    FieldId(sample_FieldIdEnum arg);
-    FieldId();
+    // func:sample.FieldId.value.Cast
+    inline               operator sample_FieldIdEnum() const __attribute__((nothrow));
+    // func:sample.FieldId..Ctor
+    inline               FieldId() __attribute__((nothrow));
+    // func:sample.FieldId..FieldwiseCtor
+    explicit inline               FieldId(i32 in_value) __attribute__((nothrow));
+    // func:sample.FieldId..EnumCtor
+    inline               FieldId(sample_FieldIdEnum arg) __attribute__((nothrow));
 };
 #pragma pack(pop)
 
 // Get value of field as enum type
 // func:sample.FieldId.value.GetEnum
-sample_FieldIdEnum   value_GetEnum(const sample::FieldId& parent) __attribute__((nothrow));
+inline sample_FieldIdEnum value_GetEnum(const sample::FieldId& parent) __attribute__((nothrow));
 // Set value of field from enum type.
 // func:sample.FieldId.value.SetEnum
-void                 value_SetEnum(sample::FieldId& parent, sample_FieldIdEnum rhs) __attribute__((nothrow));
+inline void          value_SetEnum(sample::FieldId& parent, sample_FieldIdEnum rhs) __attribute__((nothrow));
 // Convert numeric value of field to one of predefined string constants.
 // If string is found, return a static C string. Otherwise, return NULL.
 // func:sample.FieldId.value.ToCstr
@@ -374,7 +389,7 @@ bool                 value_ReadStrptrMaybe(sample::FieldId& parent, algo::strptr
 bool                 FieldId_ReadStrptrMaybe(sample::FieldId &parent, algo::strptr in_str) __attribute__((nothrow));
 // Set all fields to initial values.
 // func:sample.FieldId..Init
-void                 FieldId_Init(sample::FieldId& parent);
+inline void          FieldId_Init(sample::FieldId& parent);
 // print string representation of ROW to string STR
 // cfmt:sample.FieldId.String  printfmt:Raw
 // func:sample.FieldId..Print

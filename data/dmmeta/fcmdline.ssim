@@ -28,6 +28,7 @@ dmmeta.fcmdline  field:gcache.FDb.cmdline  read:Y  basecmdline:algo_lib.FDb.cmdl
 dmmeta.fcmdline  field:gcli.FDb.cmdline  read:Y  basecmdline:algo_lib.FDb.cmdline  comment:""
 dmmeta.fcmdline  field:lib_exec.FDb.cmdline  read:Y  basecmdline:algo_lib.FDb.cmdline  comment:""
 dmmeta.fcmdline  field:mdbg.FDb.cmdline  read:Y  basecmdline:algo_lib.FDb.cmdline  comment:""
+dmmeta.fcmdline  field:myns.FDb.cmdline  read:Y  basecmdline:algo_lib.FDb.cmdline  comment:""
 dmmeta.fcmdline  field:mysql2ssim.FDb.cmdline  read:Y  basecmdline:algo_lib.FDb.cmdline  comment:""
 dmmeta.fcmdline  field:orgfile.FDb.cmdline  read:Y  basecmdline:algo_lib.FDb.cmdline  comment:""
 dmmeta.fcmdline  field:samp_meng.FDb.cmdline  read:Y  basecmdline:algo_lib.FDb.cmdline  comment:""

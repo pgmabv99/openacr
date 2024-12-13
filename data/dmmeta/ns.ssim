@@ -53,6 +53,8 @@ dmmeta.ns  ns:lib_prot  nstype:lib  license:GPL  comment:"Library covering all p
 dmmeta.ns  ns:lib_sql  nstype:lib  license:GPL  comment:"SQL formatting functions"
 dmmeta.ns  ns:lib_sqlite  nstype:lib  license:GPL  comment:""
 dmmeta.ns  ns:mdbg  nstype:exe  license:GPL  comment:"Gdb front-end"
+dmmeta.ns  ns:myns  nstype:exe  license:GPL  comment:"create program and inherit from db"
+dmmeta.ns  ns:mynsdb  nstype:ssimdb  license:GPL  comment:""
 dmmeta.ns  ns:mysql2ssim  nstype:exe  license:GPL  comment:"mysql -> ssim conversion tool"
 dmmeta.ns  ns:orgfile  nstype:exe  license:GPL  comment:"Organize and deduplicate files by timestamp and by contents"
 dmmeta.ns  ns:report  nstype:protocol  license:GPL  comment:"Command reports"

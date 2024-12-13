@@ -26,9 +26,10 @@
 #include "include/gen/command_gen.inl.h"
 #include "include/gen/algo_gen.inl.h"
 //#pragma endinclude
-inline sample::trace::trace() {
-}
 
+// --- sample.trace..Ctor
+inline  sample::trace::trace() {
+}
 
 // --- sample.FDb.ind_hashkey.EmptyQ
 // Return true if hash is empty
@@ -83,49 +84,43 @@ inline sample::FRec& sample::_db_bh_rec_curs_Access(_db_bh_rec_curs &curs) {
 inline bool sample::_db_bh_rec_curs_ValidQ(_db_bh_rec_curs &curs) {
     return curs.temp_n > 0;
 }
-inline sample::Reckey::Reckey(i32                            in_key1
-        ,double                         in_key2
-        ,const algo::strptr&            in_key3)
-    : key1(in_key1)
-    , key2(in_key2)
-    , key3(in_key3)
-{
-}
-
-inline bool sample::Reckey::operator ==(const sample::Reckey &rhs) const {
-    return sample::Reckey_Eq(const_cast<sample::Reckey&>(*this),const_cast<sample::Reckey&>(rhs));
-}
-
-inline bool sample::Reckey::operator !=(const sample::Reckey &rhs) const {
-    return !sample::Reckey_Eq(const_cast<sample::Reckey&>(*this),const_cast<sample::Reckey&>(rhs));
-}
-
-inline bool sample::Reckey::operator <(const sample::Reckey &rhs) const {
-    return sample::Reckey_Lt(const_cast<sample::Reckey&>(*this),const_cast<sample::Reckey&>(rhs));
-}
-
-inline bool sample::Reckey::operator >(const sample::Reckey &rhs) const {
-    return rhs < *this;
-}
-
-inline bool sample::Reckey::operator <=(const sample::Reckey &rhs) const {
-    return !(rhs < *this);
-}
-
-inline bool sample::Reckey::operator >=(const sample::Reckey &rhs) const {
-    return !(*this < rhs);
-}
-inline sample::Reckey::Reckey() {
-    sample::Reckey_Init(*this);
-}
-
 
 // --- sample.Reckey..Hash
-inline u32 sample::Reckey_Hash(u32 prev, const sample::Reckey & rhs) {
+inline u32 sample::Reckey_Hash(u32 prev, const sample::Reckey& rhs) {
     prev = i32_Hash(prev, rhs.key1);
     prev = double_Hash(prev, rhs.key2);
     prev = Smallstr20_Hash(prev, rhs.key3);
     return prev;
+}
+
+// --- sample.Reckey..EqOp
+inline bool sample::Reckey::operator ==(const sample::Reckey &rhs) const {
+    return sample::Reckey_Eq(const_cast<sample::Reckey&>(*this),const_cast<sample::Reckey&>(rhs));
+}
+
+// --- sample.Reckey..NeOp
+inline bool sample::Reckey::operator !=(const sample::Reckey &rhs) const {
+    return !sample::Reckey_Eq(const_cast<sample::Reckey&>(*this),const_cast<sample::Reckey&>(rhs));
+}
+
+// --- sample.Reckey..LtOp
+inline bool sample::Reckey::operator <(const sample::Reckey &rhs) const {
+    return sample::Reckey_Lt(const_cast<sample::Reckey&>(*this),const_cast<sample::Reckey&>(rhs));
+}
+
+// --- sample.Reckey..GtOp
+inline bool sample::Reckey::operator >(const sample::Reckey &rhs) const {
+    return sample::Reckey_Lt(const_cast<sample::Reckey&>(rhs),const_cast<sample::Reckey&>(*this));
+}
+
+// --- sample.Reckey..LeOp
+inline bool sample::Reckey::operator <=(const sample::Reckey &rhs) const {
+    return !sample::Reckey_Lt(const_cast<sample::Reckey&>(rhs),const_cast<sample::Reckey&>(*this));
+}
+
+// --- sample.Reckey..GeOp
+inline bool sample::Reckey::operator >=(const sample::Reckey &rhs) const {
+    return !sample::Reckey_Lt(const_cast<sample::Reckey&>(*this),const_cast<sample::Reckey&>(rhs));
 }
 
 // --- sample.Reckey..Lt
@@ -179,14 +174,19 @@ inline bool sample::Reckey_Update(sample::Reckey &lhs, sample::Reckey& rhs) {
     }
     return ret;
 }
-inline sample::FRec::FRec() {
-    sample::FRec_Init(*this);
+
+// --- sample.Reckey..Ctor
+inline  sample::Reckey::Reckey() {
+    sample::Reckey_Init(*this);
 }
 
-inline sample::FRec::~FRec() {
-    sample::FRec_Uninit(*this);
+// --- sample.Reckey..FieldwiseCtor
+inline  sample::Reckey::Reckey(i32 in_key1, double in_key2, const algo::strptr& in_key3)
+    : key1(in_key1)
+    , key2(in_key2)
+    , key3(in_key3)
+ {
 }
-
 
 // --- sample.FRec.rec.Lt
 // Compare two fields. Comparison is anti-symmetric: if a>b, then !(b>a).
@@ -210,15 +210,16 @@ inline void sample::FRec_Init(sample::FRec& rec) {
     rec.ind_hashkey_next = (sample::FRec*)-1; // (sample.FDb.ind_hashkey) not-in-hash
     rec.bh_rec_idx = -1; // (sample.FDb.bh_rec) not-in-heap
 }
-inline sample::FieldId::FieldId(i32                            in_value)
-    : value(in_value)
-{
-}
-inline sample::FieldId::FieldId(sample_FieldIdEnum arg) { this->value = i32(arg); }
-inline sample::FieldId::FieldId() {
-    sample::FieldId_Init(*this);
+
+// --- sample.FRec..Ctor
+inline  sample::FRec::FRec() {
+    sample::FRec_Init(*this);
 }
 
+// --- sample.FRec..Dtor
+inline  sample::FRec::~FRec() {
+    sample::FRec_Uninit(*this);
+}
 
 // --- sample.FieldId.value.GetEnum
 // Get value of field as enum type
@@ -233,7 +234,7 @@ inline void sample::value_SetEnum(sample::FieldId& parent, sample_FieldIdEnum rh
 }
 
 // --- sample.FieldId.value.Cast
-inline sample::FieldId::operator sample_FieldIdEnum () const {
+inline  sample::FieldId::operator sample_FieldIdEnum() const {
     return sample_FieldIdEnum((*this).value);
 }
 
@@ -241,6 +242,22 @@ inline sample::FieldId::operator sample_FieldIdEnum () const {
 // Set all fields to initial values.
 inline void sample::FieldId_Init(sample::FieldId& parent) {
     parent.value = i32(-1);
+}
+
+// --- sample.FieldId..Ctor
+inline  sample::FieldId::FieldId() {
+    sample::FieldId_Init(*this);
+}
+
+// --- sample.FieldId..FieldwiseCtor
+inline  sample::FieldId::FieldId(i32 in_value)
+    : value(in_value)
+ {
+}
+
+// --- sample.FieldId..EnumCtor
+inline  sample::FieldId::FieldId(sample_FieldIdEnum arg) {
+    this->value = i32(arg);
 }
 
 inline algo::cstring &algo::operator <<(algo::cstring &str, const sample::trace &row) {// cfmt:sample.trace.String

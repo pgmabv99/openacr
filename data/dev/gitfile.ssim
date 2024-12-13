@@ -77,6 +77,7 @@ dev.gitfile  gitfile:bin/lines-to-dots
 dev.gitfile  gitfile:bin/lsfunc
 dev.gitfile  gitfile:bin/mdbg
 dev.gitfile  gitfile:bin/msloc.pl
+dev.gitfile  gitfile:bin/myns
 dev.gitfile  gitfile:bin/mysql2ssim
 dev.gitfile  gitfile:bin/nogen
 dev.gitfile  gitfile:bin/normalize
@@ -395,6 +396,8 @@ dev.gitfile  gitfile:cpp/gen/lib_prot_gen.cpp
 dev.gitfile  gitfile:cpp/gen/lib_sql_gen.cpp
 dev.gitfile  gitfile:cpp/gen/lib_sqlite_gen.cpp
 dev.gitfile  gitfile:cpp/gen/mdbg_gen.cpp
+dev.gitfile  gitfile:cpp/gen/myns_gen.cpp
+dev.gitfile  gitfile:cpp/gen/mynsdb_gen.cpp
 dev.gitfile  gitfile:cpp/gen/mysql2ssim_gen.cpp
 dev.gitfile  gitfile:cpp/gen/orgfile_gen.cpp
 dev.gitfile  gitfile:cpp/gen/report_gen.cpp
@@ -448,6 +451,7 @@ dev.gitfile  gitfile:cpp/lib_ams/stream.cpp
 dev.gitfile  gitfile:cpp/lib_sqlite/lib_sqlite.cpp
 dev.gitfile  gitfile:cpp/lib_sqlite/vtab.cpp
 dev.gitfile  gitfile:cpp/mdbg/mdbg.cpp
+dev.gitfile  gitfile:cpp/myns/myns.cpp
 dev.gitfile  gitfile:cpp/mysql2ssim.cpp
 dev.gitfile  gitfile:cpp/orgfile.cpp
 dev.gitfile  gitfile:cpp/samp_meng/samp_meng.cpp
@@ -695,6 +699,7 @@ dev.gitfile  gitfile:data/gclidb/mrjob.ssim
 dev.gitfile  gitfile:data/gclidb/mrnote.ssim
 dev.gitfile  gitfile:data/gclidb/project.ssim
 dev.gitfile  gitfile:data/gclidb/user.ssim
+dev.gitfile  gitfile:data/mynsdb/part.ssim
 dev.gitfile  gitfile:extern/.empty
 dev.gitfile  gitfile:extern/gclitest/id_rsa_gclisvc
 dev.gitfile  gitfile:extern/sqlite-3470000/shell.c
@@ -838,6 +843,10 @@ dev.gitfile  gitfile:include/gen/lib_sqlite_gen.h
 dev.gitfile  gitfile:include/gen/lib_sqlite_gen.inl.h
 dev.gitfile  gitfile:include/gen/mdbg_gen.h
 dev.gitfile  gitfile:include/gen/mdbg_gen.inl.h
+dev.gitfile  gitfile:include/gen/myns_gen.h
+dev.gitfile  gitfile:include/gen/myns_gen.inl.h
+dev.gitfile  gitfile:include/gen/mynsdb_gen.h
+dev.gitfile  gitfile:include/gen/mynsdb_gen.inl.h
 dev.gitfile  gitfile:include/gen/mysql2ssim_gen.h
 dev.gitfile  gitfile:include/gen/mysql2ssim_gen.inl.h
 dev.gitfile  gitfile:include/gen/orgfile_gen.h
@@ -880,6 +889,7 @@ dev.gitfile  gitfile:include/lib_json.inl.h
 dev.gitfile  gitfile:include/lib_mysql.h
 dev.gitfile  gitfile:include/lib_sql.h
 dev.gitfile  gitfile:include/lib_sqlite.h
+dev.gitfile  gitfile:include/myns.h
 dev.gitfile  gitfile:include/orgfile.h
 dev.gitfile  gitfile:include/samp_meng.h
 dev.gitfile  gitfile:include/samp_regx.h
@@ -1193,6 +1203,8 @@ dev.gitfile  gitfile:txt/exe/gcli/README.md
 dev.gitfile  gitfile:txt/exe/gcli/internals.md
 dev.gitfile  gitfile:txt/exe/mdbg/README.md
 dev.gitfile  gitfile:txt/exe/mdbg/internals.md
+dev.gitfile  gitfile:txt/exe/myns/README.md
+dev.gitfile  gitfile:txt/exe/myns/internals.md
 dev.gitfile  gitfile:txt/exe/mysql2ssim/README.md
 dev.gitfile  gitfile:txt/exe/mysql2ssim/internals.md
 dev.gitfile  gitfile:txt/exe/orgfile/README.md
@@ -1200,8 +1212,8 @@ dev.gitfile  gitfile:txt/exe/orgfile/internals.md
 dev.gitfile  gitfile:txt/exe/samp_meng/README.md
 dev.gitfile  gitfile:txt/exe/samp_meng/internals.md
 dev.gitfile  gitfile:txt/exe/samp_regx/README.md
-dev.gitfile  gitfile:txt/exe/sample/README.md
 dev.gitfile  gitfile:txt/exe/samp_regx/internals.md
+dev.gitfile  gitfile:txt/exe/sample/README.md
 dev.gitfile  gitfile:txt/exe/sandbox/README.md
 dev.gitfile  gitfile:txt/exe/sandbox/internals.md
 dev.gitfile  gitfile:txt/exe/src_func/README.md
@@ -1598,6 +1610,8 @@ dev.gitfile  gitfile:txt/ssimdb/gclidb/mrjob.md
 dev.gitfile  gitfile:txt/ssimdb/gclidb/mrnote.md
 dev.gitfile  gitfile:txt/ssimdb/gclidb/project.md
 dev.gitfile  gitfile:txt/ssimdb/gclidb/user.md
+dev.gitfile  gitfile:txt/ssimdb/mynsdb/README.md
+dev.gitfile  gitfile:txt/ssimdb/mynsdb/part.md
 dev.gitfile  gitfile:txt/tut/README.md
 dev.gitfile  gitfile:txt/tut/tut1.md
 dev.gitfile  gitfile:txt/tut/tut2.md
