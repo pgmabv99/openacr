@@ -10,6 +10,7 @@ dmmeta.dispatch_msg  dispatch_msg:lib_ams.CtlMsg/ams.DumpStreamTableMsg  comment
 dmmeta.dispatch_msg  dispatch_msg:lib_ams.CtlMsg/ams.ProcAddMsg  comment:""
 dmmeta.dispatch_msg  dispatch_msg:lib_ams.CtlMsg/ams.ProcRemoveMsg  comment:""
 dmmeta.dispatch_msg  dispatch_msg:lib_ams.CtlMsg/ams.StreamHbMsg  comment:""
+dmmeta.dispatch_msg  dispatch_msg:myns.In/myns.NewOrderReqMsg  comment:""
 dmmeta.dispatch_msg  dispatch_msg:samp_meng.In/samp_meng.CancelReqMsg  comment:""
 dmmeta.dispatch_msg  dispatch_msg:samp_meng.In/samp_meng.MassCancelReqMsg  comment:""
 dmmeta.dispatch_msg  dispatch_msg:samp_meng.In/samp_meng.NewOrderReqMsg  comment:""

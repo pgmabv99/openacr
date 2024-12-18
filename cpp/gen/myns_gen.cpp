@@ -620,6 +620,7 @@ static void myns::InitReflection() {
 
 
     // -- load signatures of existing dispatches --
+    algo_lib::InsertStrptrMaybe("dmmeta.Dispsigcheck  dispsig:'myns.In'  signature:'c9f730a8aadf73df012ec0b95ce843afd2eab6af'");
     algo_lib::InsertStrptrMaybe("dmmeta.Dispsigcheck  dispsig:'myns.Input'  signature:'c1b8ee36e7e3fd26817f2b441266623f3cec9476'");
 }
 
@@ -2182,6 +2183,76 @@ void myns::FieldId_Print(myns::FieldId& row, algo::cstring& str) {
     myns::value_Print(row, str);
 }
 
+// --- myns.InCase.value.ToCstr
+// Convert numeric value of field to one of predefined string constants.
+// If string is found, return a static C string. Otherwise, return NULL.
+const char* myns::value_ToCstr(const myns::InCase& parent) {
+    const char *ret = NULL;
+    switch(value_GetEnum(parent)) {
+        case myns_InCase_myns_NewOrderReqMsg: ret = "myns.NewOrderReqMsg";  break;
+    }
+    return ret;
+}
+
+// --- myns.InCase.value.Print
+// Convert value to a string. First, attempt conversion to a known string.
+// If no string matches, print value as a numeric value.
+void myns::value_Print(const myns::InCase& parent, algo::cstring &lhs) {
+    const char *strval = value_ToCstr(parent);
+    if (strval) {
+        lhs << strval;
+    } else {
+        lhs << parent.value;
+    }
+}
+
+// --- myns.InCase.value.SetStrptrMaybe
+// Convert string to field.
+// If the string is invalid, do not modify field and return false.
+// In case of success, return true
+bool myns::value_SetStrptrMaybe(myns::InCase& parent, algo::strptr rhs) {
+    bool ret = false;
+    switch (elems_N(rhs)) {
+        case 19: {
+            switch (algo::ReadLE64(rhs.elems)) {
+                case LE_STR8('m','y','n','s','.','N','e','w'): {
+                    if (memcmp(rhs.elems+8,"OrderReqMsg",11)==0) { value_SetEnum(parent,myns_InCase_myns_NewOrderReqMsg); ret = true; break; }
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    return ret;
+}
+
+// --- myns.InCase.value.SetStrptr
+// Convert string to field.
+// If the string is invalid, set numeric value to DFLT
+void myns::value_SetStrptr(myns::InCase& parent, algo::strptr rhs, myns_InCaseEnum dflt) {
+    if (!value_SetStrptrMaybe(parent,rhs)) value_SetEnum(parent,dflt);
+}
+
+// --- myns.InCase.value.ReadStrptrMaybe
+// Convert string to field. Return success value
+bool myns::value_ReadStrptrMaybe(myns::InCase& parent, algo::strptr rhs) {
+    bool retval = false;
+    retval = value_SetStrptrMaybe(parent,rhs); // try symbol conversion
+    if (!retval) { // didn't work? try reading as underlying type
+        retval = u32_ReadStrptrMaybe(parent.value,rhs);
+    }
+    return retval;
+}
+
+// --- myns.InCase..ReadStrptrMaybe
+// Read fields of myns::InCase from an ascii string.
+// The format of the string is the format of the myns::InCase's only field
+bool myns::InCase_ReadStrptrMaybe(myns::InCase &parent, algo::strptr in_str) {
+    bool retval = true;
+    retval = retval && value_ReadStrptrMaybe(parent, in_str);
+    return retval;
+}
+
 // --- myns.MsgHeaderMsgsCase.value.ToCstr
 // Convert numeric value of field to one of predefined string constants.
 // If string is found, return a static C string. Otherwise, return NULL.
@@ -2420,9 +2491,52 @@ inline static void myns::SizeCheck() {
 // --- myns...StaticCheck
 void myns::StaticCheck() {
     algo_assert(_offset_of(myns::FieldId, value) + sizeof(((myns::FieldId*)0)->value) == sizeof(myns::FieldId));
+    algo_assert(_offset_of(myns::InCase, value) + sizeof(((myns::InCase*)0)->value) == sizeof(myns::InCase));
     algo_assert(_offset_of(myns::MsgHeaderMsgsCase, value) + sizeof(((myns::MsgHeaderMsgsCase*)0)->value) == sizeof(myns::MsgHeaderMsgsCase));
     algo_assert(_offset_of(myns::MsgHeader_curs, msglen) + sizeof(((myns::MsgHeader_curs*)0)->msglen) == sizeof(myns::MsgHeader_curs));
     algo_assert(_offset_of(myns::NewOrderReqMsg, amt) + sizeof(((myns::NewOrderReqMsg*)0)->amt) == sizeof(myns::NewOrderReqMsg));
+}
+
+// --- myns.In..DispatchRaw
+int myns::InDispatchRaw(myns::InCase type, u8 *msg, u32 len) {
+    int ret = 0;
+    switch(type) {
+        case 66: if (sizeof(myns::NewOrderReqMsg) <= len) {
+            myns::In_NewOrderReqMsg((myns::NewOrderReqMsg&)*msg);
+            ret = (int)sizeof(myns::NewOrderReqMsg);
+        } break;
+        default:
+        break;
+    }
+    return ret;
+}
+
+// --- myns.In..Dispatch
+int myns::InDispatch(myns::MsgHeader& msg) {
+    return InDispatchRaw(myns::InCase(msg.type), (u8*)&msg, i32(msg.length));
+}
+
+// --- myns.In..Dispatch2
+// void rettype useful for hooks
+void myns::vInDispatch(myns::MsgHeader& msg) {
+    InDispatch(msg);
+}
+
+// --- myns.In..Print
+// Print message to STR. If message is too short for MSG_LEN, print nothing.
+// MSG.LENGTH must have already been validated against msg_len.
+// This function will additionally validate that sizeof(Msg) <= msg_len
+bool myns::In_Print(algo::cstring &str, myns::MsgHeader &msg, u32 msg_len) {
+    switch(msg.type) {
+        case 66: {
+            if (sizeof(myns::NewOrderReqMsg) > msg_len) { return false; }
+            NewOrderReqMsg_Print((myns::NewOrderReqMsg&)(msg), str);
+            return true;
+        }
+        default:
+
+        return false;
+    }
 }
 
 // --- myns.MsgHeaderMsgs..Print
@@ -2440,6 +2554,34 @@ bool myns::MsgHeaderMsgs_Print(algo::cstring &str, myns::MsgHeader &msg, u32 msg
 
         return false;
     }
+}
+
+// --- myns.In..ReadStrptr
+// Parse ascii representation of message into binary, appending new data to BUF.
+myns::InCase myns::In_ReadStrptr(algo::strptr str, algo::ByteAry &buf) {
+    bool ok = false;
+    tempstr msgtype_str;
+    algo::StringIter iter(str);
+    cstring_ReadCmdarg(msgtype_str, iter, false); // read first word
+    myns::InCase msgtype;
+    value_SetStrptrMaybe(msgtype, msgtype_str); // map string -> enum
+    switch (value_GetEnum(msgtype)) { // what message is it?
+        case myns_InCase_myns_NewOrderReqMsg: {
+            int len = sizeof(myns::NewOrderReqMsg);
+            myns::NewOrderReqMsg *ctype = new(ary_AllocN(buf, len).elems) myns::NewOrderReqMsg; // default values
+            ok = NewOrderReqMsg_ReadStrptrMaybe(*ctype, str); // now read attributes
+        } break; // myns::NewOrderReqMsg case
+
+        default: break;
+    }
+    return ok ? msgtype : myns::InCase();
+}
+
+// --- myns.In..ReadStrptrMaybe
+// Parse ascii representation of message into binary, appending new data to BUF.
+bool myns::In_ReadStrptrMaybe(algo::strptr str, algo::ByteAry &buf) {
+    myns::InCase msgtype = In_ReadStrptr(str,buf);
+    return !(msgtype == myns::InCase());
 }
 
 // --- myns.MsgHeaderMsgs..ReadStrptr

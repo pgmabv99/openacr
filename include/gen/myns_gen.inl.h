@@ -679,6 +679,45 @@ inline  myns::FieldId::FieldId(myns_FieldIdEnum arg) {
     this->value = i32(arg);
 }
 
+// --- myns.InCase.value.GetEnum
+// Get value of field as enum type
+inline myns_InCaseEnum myns::value_GetEnum(const myns::InCase& parent) {
+    return myns_InCaseEnum(parent.value);
+}
+
+// --- myns.InCase.value.SetEnum
+// Set value of field from enum type.
+inline void myns::value_SetEnum(myns::InCase& parent, myns_InCaseEnum rhs) {
+    parent.value = u32(rhs);
+}
+
+// --- myns.InCase.value.Cast
+inline  myns::InCase::operator myns_InCaseEnum() const {
+    return myns_InCaseEnum((*this).value);
+}
+
+// --- myns.InCase..Init
+// Set all fields to initial values.
+inline void myns::InCase_Init(myns::InCase& parent) {
+    parent.value = u32(0);
+}
+
+// --- myns.InCase..Ctor
+inline  myns::InCase::InCase() {
+    myns::InCase_Init(*this);
+}
+
+// --- myns.InCase..FieldwiseCtor
+inline  myns::InCase::InCase(u32 in_value)
+    : value(in_value)
+ {
+}
+
+// --- myns.InCase..EnumCtor
+inline  myns::InCase::InCase(myns_InCaseEnum arg) {
+    this->value = u32(arg);
+}
+
 // --- myns.MsgHeaderMsgsCase.value.GetEnum
 // Get value of field as enum type
 inline myns_MsgHeaderMsgsCaseEnum myns::value_GetEnum(const myns::MsgHeaderMsgsCase& parent) {

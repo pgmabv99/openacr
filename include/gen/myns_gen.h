@@ -53,6 +53,15 @@ enum myns_FieldIdEnum {           // myns.FieldId.value
 enum { myns_FieldIdEnum_N = 6 };
 
 
+// --- myns_InCaseEnum
+
+enum myns_InCaseEnum {                       // myns.InCase.value
+     myns_InCase_myns_NewOrderReqMsg   = 66
+};
+
+enum { myns_InCaseEnum_N = 1 };
+
+
 // --- myns_MsgHeaderMsgsCaseEnum
 
 enum myns_MsgHeaderMsgsCaseEnum {                       // myns.MsgHeaderMsgsCase.value
@@ -91,6 +100,7 @@ namespace myns { struct Client; }
 namespace myns { struct trace; }
 namespace myns { struct FDb; }
 namespace myns { struct FieldId; }
+namespace myns { struct InCase; }
 namespace myns { struct MsgHeaderMsgsCase; }
 namespace myns { struct MsgHeader_curs; }
 namespace myns { struct Order; }
@@ -940,6 +950,56 @@ inline void          FieldId_Init(myns::FieldId& parent);
 // func:myns.FieldId..Print
 void                 FieldId_Print(myns::FieldId& row, algo::cstring& str) __attribute__((nothrow));
 
+// --- myns.InCase
+#pragma pack(push,1)
+struct InCase { // myns.InCase: Enum for dispatch myns.In
+    u32   value;   //   0
+    // func:myns.InCase.value.Cast
+    inline               operator myns_InCaseEnum() const __attribute__((nothrow));
+    // func:myns.InCase..Ctor
+    inline               InCase() __attribute__((nothrow));
+    // func:myns.InCase..FieldwiseCtor
+    explicit inline               InCase(u32 in_value) __attribute__((nothrow));
+    // func:myns.InCase..EnumCtor
+    inline               InCase(myns_InCaseEnum arg) __attribute__((nothrow));
+};
+#pragma pack(pop)
+
+// Get value of field as enum type
+// func:myns.InCase.value.GetEnum
+inline myns_InCaseEnum value_GetEnum(const myns::InCase& parent) __attribute__((nothrow));
+// Set value of field from enum type.
+// func:myns.InCase.value.SetEnum
+inline void          value_SetEnum(myns::InCase& parent, myns_InCaseEnum rhs) __attribute__((nothrow));
+// Convert numeric value of field to one of predefined string constants.
+// If string is found, return a static C string. Otherwise, return NULL.
+// func:myns.InCase.value.ToCstr
+const char*          value_ToCstr(const myns::InCase& parent) __attribute__((nothrow));
+// Convert value to a string. First, attempt conversion to a known string.
+// If no string matches, print value as a numeric value.
+// func:myns.InCase.value.Print
+void                 value_Print(const myns::InCase& parent, algo::cstring &lhs) __attribute__((nothrow));
+// Convert string to field.
+// If the string is invalid, do not modify field and return false.
+// In case of success, return true
+// func:myns.InCase.value.SetStrptrMaybe
+bool                 value_SetStrptrMaybe(myns::InCase& parent, algo::strptr rhs) __attribute__((nothrow));
+// Convert string to field.
+// If the string is invalid, set numeric value to DFLT
+// func:myns.InCase.value.SetStrptr
+void                 value_SetStrptr(myns::InCase& parent, algo::strptr rhs, myns_InCaseEnum dflt) __attribute__((nothrow));
+// Convert string to field. Return success value
+// func:myns.InCase.value.ReadStrptrMaybe
+bool                 value_ReadStrptrMaybe(myns::InCase& parent, algo::strptr rhs) __attribute__((nothrow));
+
+// Read fields of myns::InCase from an ascii string.
+// The format of the string is the format of the myns::InCase's only field
+// func:myns.InCase..ReadStrptrMaybe
+bool                 InCase_ReadStrptrMaybe(myns::InCase &parent, algo::strptr in_str) __attribute__((nothrow));
+// Set all fields to initial values.
+// func:myns.InCase..Init
+inline void          InCase_Init(myns::InCase& parent);
+
 // --- myns.MsgHeaderMsgsCase
 #pragma pack(push,1)
 struct MsgHeaderMsgsCase { // myns.MsgHeaderMsgsCase: Enum for dispatch myns.MsgHeaderMsgs
@@ -1211,11 +1271,33 @@ struct part_zd_partorder_curs {// fcurs:myns.FPart.zd_partorder/curs
 namespace myns { // gen:ns_func
 // func:myns...StaticCheck
 void                 StaticCheck();
+// User-implemented callback function for dispatch In
+// func:myns.In.myns.NewOrderReqMsg
+// this function is 'extrn' and implemented by user
+void                 In_NewOrderReqMsg(myns::NewOrderReqMsg &msg);
+// func:myns.In..DispatchRaw
+int                  InDispatchRaw(myns::InCase type, u8 *msg, u32 len);
+// func:myns.In..Dispatch
+int                  InDispatch(myns::MsgHeader& msg);
+// void rettype useful for hooks
+// func:myns.In..Dispatch2
+void                 vInDispatch(myns::MsgHeader& msg);
+// Print message to STR. If message is too short for MSG_LEN, print nothing.
+// MSG.LENGTH must have already been validated against msg_len.
+// This function will additionally validate that sizeof(Msg) <= msg_len
+// func:myns.In..Print
+bool                 In_Print(algo::cstring &str, myns::MsgHeader &msg, u32 msg_len);
 // Print message to STR. If message is too short for MSG_LEN, print nothing.
 // MSG.LENGTH must have already been validated against msg_len.
 // This function will additionally validate that sizeof(Msg) <= msg_len
 // func:myns.MsgHeaderMsgs..Print
 bool                 MsgHeaderMsgs_Print(algo::cstring &str, myns::MsgHeader &msg, u32 msg_len);
+// Parse ascii representation of message into binary, appending new data to BUF.
+// func:myns.In..ReadStrptr
+myns::InCase         In_ReadStrptr(algo::strptr str, algo::ByteAry &buf);
+// Parse ascii representation of message into binary, appending new data to BUF.
+// func:myns.In..ReadStrptrMaybe
+bool                 In_ReadStrptrMaybe(algo::strptr str, algo::ByteAry &buf);
 // Parse ascii representation of message into binary, appending new data to BUF.
 // func:myns.MsgHeaderMsgs..ReadStrptr
 myns::MsgHeaderMsgsCase MsgHeaderMsgs_ReadStrptr(algo::strptr str, algo::ByteAry &buf);
