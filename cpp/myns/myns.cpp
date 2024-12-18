@@ -425,16 +425,16 @@ void myns::tcp_read(myns::Client &client_obj)
 
 }
 
-// void myns::In_NewOrderReqMsg(myns::NewOrderReqMsg &msg)
-// {
-//     algo::Smallstr50 part_key;
-//     part_key = msg.part_key;
-//     auto amt = msg.amt;
-//     prlog("part_key: " << part_key << ", amt: " << amt);
+void myns::In_NewOrderReqMsg(myns::NewOrderReqMsg &msg)
+{
+    algo::Smallstr50 part_key;
+    part_key = msg.part_key;
+    auto amt = msg.amt;
+    prlog("part_key: " << part_key << ", amt: " << amt);
 
-//     // add the order
-//     // auto retval = myns::add_order(algo::Smallstr50(part_key), amt);
-// }
+    // add the order
+    // auto retval = myns::add_order(algo::Smallstr50(part_key), amt);
+}
 
 void myns::trm_listen()
 {

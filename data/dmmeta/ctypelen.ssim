@@ -1068,8 +1068,8 @@ dmmeta.ctypelen  ctype:lib_sqlite.VtabCurs  len:8328  alignment:8  padbytes:3  p
 dmmeta.ctypelen  ctype:mdbg.FBuilddir  len:205  alignment:1  padbytes:0  plaindata:Y
 dmmeta.ctypelen  ctype:mdbg.FCfg  len:240  alignment:8  padbytes:5  plaindata:N
 dmmeta.ctypelen  ctype:mdbg.FDb  len:1032  alignment:8  padbytes:10  plaindata:N
-dmmeta.ctypelen  ctype:myns.Client  len:160  alignment:8  padbytes:8  plaindata:N
-dmmeta.ctypelen  ctype:myns.FDb  len:520  alignment:8  padbytes:26  plaindata:N
+dmmeta.ctypelen  ctype:myns.Client  len:8448  alignment:8  padbytes:17  plaindata:N
+dmmeta.ctypelen  ctype:myns.FDb  len:544  alignment:8  padbytes:26  plaindata:N
 dmmeta.ctypelen  ctype:myns.FPart  len:264  alignment:8  padbytes:8  plaindata:N
 dmmeta.ctypelen  ctype:myns.MsgHeader  len:2  alignment:1  padbytes:0  plaindata:Y
 dmmeta.ctypelen  ctype:myns.NewOrderReqMsg  len:58  alignment:1  padbytes:0  plaindata:Y

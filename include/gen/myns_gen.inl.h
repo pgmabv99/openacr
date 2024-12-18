@@ -29,16 +29,67 @@
 #include "include/gen/mynsdb_gen.inl.h"
 //#pragma endinclude
 
-// --- myns.Client..Init
+// --- myns.MsgHeader.type.GetEnum
+// Get value of field as enum type
+inline myns_MsgHeader_type_Enum myns::type_GetEnum(const myns::MsgHeader& in) {
+    return myns_MsgHeader_type_Enum(in.type);
+}
+
+// --- myns.MsgHeader.type.SetEnum
+// Set value of field from enum type.
+inline void myns::type_SetEnum(myns::MsgHeader& in, myns_MsgHeader_type_Enum rhs) {
+    in.type = u8(rhs);
+}
+
+// --- myns.MsgHeader..GetMsgLength
+// Message length (uses length field)
+inline i32 myns::GetMsgLength(const myns::MsgHeader& parent) {
+    return i32(const_cast<myns::MsgHeader&>(parent).length);
+}
+
+// --- myns.MsgHeader..GetMsgMemptr
+// Memptr encompassing the message (uses length field)
+inline algo::memptr myns::GetMsgMemptr(const myns::MsgHeader& row) {
+    return algo::memptr((u8*)&row, i32(const_cast<myns::MsgHeader&>(row).length));
+}
+
+// --- myns.MsgHeader..Init
 // Set all fields to initial values.
-inline void myns::Client_Init(myns::Client& client) {
-    client.client_next = (myns::Client*)-1; // (myns.FDb.client) not-in-tpool's freelist
-    client.ind_client_next = (myns::Client*)-1; // (myns.FDb.ind_client) not-in-hash
+inline void myns::MsgHeader_Init(myns::MsgHeader& in) {
+    in.type = u8(0);
+    in.length = u8(0);
+}
+
+// --- myns.MsgHeader..Ctor
+inline  myns::MsgHeader::MsgHeader() {
+    myns::MsgHeader_Init(*this);
+}
+
+// --- myns.MsgHeader..FieldwiseCtor
+inline  myns::MsgHeader::MsgHeader(u8 in_type, u8 in_length)
+    : type(in_type)
+    , length(in_length)
+ {
+}
+
+// --- myns.Client.in.Max
+// Return max. number of bytes in the buffer.
+inline i32 myns::in_Max(myns::Client& client) {
+    return 8192;
+    (void)client;//only to avoid -Wunused-parameter
+}
+
+// --- myns.Client.in.N
+// Return number of bytes in the buffer.
+inline i32 myns::in_N(myns::Client& client) {
+    return client.in_end - client.in_start;
 }
 
 // --- myns.Client..Ctor
 inline  myns::Client::Client() {
     myns::Client_Init(*this);
+    // added because myns.Client.in (Fbuf) does not need initialization
+    // coverity[uninit_member]
 }
 
 // --- myns.Client..Dtor
@@ -48,6 +99,118 @@ inline  myns::Client::~Client() {
 
 // --- myns.trace..Ctor
 inline  myns::trace::trace() {
+}
+
+// --- myns.FDb.cd_fdin_eof.EmptyQ
+// Return true if index is empty
+inline bool myns::cd_fdin_eof_EmptyQ() {
+    return _db.cd_fdin_eof_head == NULL;
+}
+
+// --- myns.FDb.cd_fdin_eof.First
+// If index empty, return NULL. Otherwise return pointer to first element in index
+inline myns::Client* myns::cd_fdin_eof_First() {
+    myns::Client *row = NULL;
+    row = _db.cd_fdin_eof_head;
+    return row;
+}
+
+// --- myns.FDb.cd_fdin_eof.InLlistQ
+// Return true if row is in the linked list, false otherwise
+inline bool myns::cd_fdin_eof_InLlistQ(myns::Client& row) {
+    bool result = false;
+    result = !(row.cd_fdin_eof_next == (myns::Client*)-1);
+    return result;
+}
+
+// --- myns.FDb.cd_fdin_eof.Last
+// If index empty, return NULL. Otherwise return pointer to last element in index
+inline myns::Client* myns::cd_fdin_eof_Last() {
+    myns::Client *row = NULL;
+    row = _db.cd_fdin_eof_head ? _db.cd_fdin_eof_head->cd_fdin_eof_prev : NULL;
+    return row;
+}
+
+// --- myns.FDb.cd_fdin_eof.N
+// Return number of items in the linked list
+inline i32 myns::cd_fdin_eof_N() {
+    return _db.cd_fdin_eof_n;
+}
+
+// --- myns.FDb.cd_fdin_eof.Next
+// Return pointer to next element in the list
+inline myns::Client* myns::cd_fdin_eof_Next(myns::Client &row) {
+    return row.cd_fdin_eof_next;
+}
+
+// --- myns.FDb.cd_fdin_eof.Prev
+// Return pointer to previous element in the list
+inline myns::Client* myns::cd_fdin_eof_Prev(myns::Client &row) {
+    return row.cd_fdin_eof_prev;
+}
+
+// --- myns.FDb.cd_fdin_eof.qLast
+// Return reference to last element in the index. No bounds checking.
+inline myns::Client& myns::cd_fdin_eof_qLast() {
+    myns::Client *row = NULL;
+    row = _db.cd_fdin_eof_head ? _db.cd_fdin_eof_head->cd_fdin_eof_prev : NULL;
+    return *row;
+}
+
+// --- myns.FDb.cd_fdin_read.EmptyQ
+// Return true if index is empty
+inline bool myns::cd_fdin_read_EmptyQ() {
+    return _db.cd_fdin_read_head == NULL;
+}
+
+// --- myns.FDb.cd_fdin_read.First
+// If index empty, return NULL. Otherwise return pointer to first element in index
+inline myns::Client* myns::cd_fdin_read_First() {
+    myns::Client *row = NULL;
+    row = _db.cd_fdin_read_head;
+    return row;
+}
+
+// --- myns.FDb.cd_fdin_read.InLlistQ
+// Return true if row is in the linked list, false otherwise
+inline bool myns::cd_fdin_read_InLlistQ(myns::Client& row) {
+    bool result = false;
+    result = !(row.cd_fdin_read_next == (myns::Client*)-1);
+    return result;
+}
+
+// --- myns.FDb.cd_fdin_read.Last
+// If index empty, return NULL. Otherwise return pointer to last element in index
+inline myns::Client* myns::cd_fdin_read_Last() {
+    myns::Client *row = NULL;
+    row = _db.cd_fdin_read_head ? _db.cd_fdin_read_head->cd_fdin_read_prev : NULL;
+    return row;
+}
+
+// --- myns.FDb.cd_fdin_read.N
+// Return number of items in the linked list
+inline i32 myns::cd_fdin_read_N() {
+    return _db.cd_fdin_read_n;
+}
+
+// --- myns.FDb.cd_fdin_read.Next
+// Return pointer to next element in the list
+inline myns::Client* myns::cd_fdin_read_Next(myns::Client &row) {
+    return row.cd_fdin_read_next;
+}
+
+// --- myns.FDb.cd_fdin_read.Prev
+// Return pointer to previous element in the list
+inline myns::Client* myns::cd_fdin_read_Prev(myns::Client &row) {
+    return row.cd_fdin_read_prev;
+}
+
+// --- myns.FDb.cd_fdin_read.qLast
+// Return reference to last element in the index. No bounds checking.
+inline myns::Client& myns::cd_fdin_read_qLast() {
+    myns::Client *row = NULL;
+    row = _db.cd_fdin_read_head ? _db.cd_fdin_read_head->cd_fdin_read_prev : NULL;
+    return *row;
 }
 
 // --- myns.FDb.ind_client.EmptyQ
@@ -238,6 +401,64 @@ inline myns::Order& myns::zd_order_qLast() {
     myns::Order *row = NULL;
     row = _db.zd_order_tail;
     return *row;
+}
+
+// --- myns.FDb.cd_fdin_eof_curs.Reset
+// cursor points to valid item
+inline void myns::_db_cd_fdin_eof_curs_Reset(_db_cd_fdin_eof_curs &curs, myns::FDb &parent) {
+    curs.row = parent.cd_fdin_eof_head;
+    curs.head = &parent.cd_fdin_eof_head;
+}
+
+// --- myns.FDb.cd_fdin_eof_curs.ValidQ
+// cursor points to valid item
+inline bool myns::_db_cd_fdin_eof_curs_ValidQ(_db_cd_fdin_eof_curs &curs) {
+    return curs.row != NULL;
+}
+
+// --- myns.FDb.cd_fdin_eof_curs.Next
+// proceed to next item
+inline void myns::_db_cd_fdin_eof_curs_Next(_db_cd_fdin_eof_curs &curs) {
+    myns::Client *next = (*curs.row).cd_fdin_eof_next;
+    curs.row = next;
+    if (curs.row == *curs.head) {
+        curs.row = NULL;
+    }
+}
+
+// --- myns.FDb.cd_fdin_eof_curs.Access
+// item access
+inline myns::Client& myns::_db_cd_fdin_eof_curs_Access(_db_cd_fdin_eof_curs &curs) {
+    return *curs.row;
+}
+
+// --- myns.FDb.cd_fdin_read_curs.Reset
+// cursor points to valid item
+inline void myns::_db_cd_fdin_read_curs_Reset(_db_cd_fdin_read_curs &curs, myns::FDb &parent) {
+    curs.row = parent.cd_fdin_read_head;
+    curs.head = &parent.cd_fdin_read_head;
+}
+
+// --- myns.FDb.cd_fdin_read_curs.ValidQ
+// cursor points to valid item
+inline bool myns::_db_cd_fdin_read_curs_ValidQ(_db_cd_fdin_read_curs &curs) {
+    return curs.row != NULL;
+}
+
+// --- myns.FDb.cd_fdin_read_curs.Next
+// proceed to next item
+inline void myns::_db_cd_fdin_read_curs_Next(_db_cd_fdin_read_curs &curs) {
+    myns::Client *next = (*curs.row).cd_fdin_read_next;
+    curs.row = next;
+    if (curs.row == *curs.head) {
+        curs.row = NULL;
+    }
+}
+
+// --- myns.FDb.cd_fdin_read_curs.Access
+// item access
+inline myns::Client& myns::_db_cd_fdin_read_curs_Access(_db_cd_fdin_read_curs &curs) {
+    return *curs.row;
 }
 
 // --- myns.FDb.part_curs.Reset
@@ -458,49 +679,6 @@ inline  myns::FieldId::FieldId(myns_FieldIdEnum arg) {
     this->value = i32(arg);
 }
 
-// --- myns.MsgHeader.type.GetEnum
-// Get value of field as enum type
-inline myns_MsgHeader_type_Enum myns::type_GetEnum(const myns::MsgHeader& parent) {
-    return myns_MsgHeader_type_Enum(parent.type);
-}
-
-// --- myns.MsgHeader.type.SetEnum
-// Set value of field from enum type.
-inline void myns::type_SetEnum(myns::MsgHeader& parent, myns_MsgHeader_type_Enum rhs) {
-    parent.type = u8(rhs);
-}
-
-// --- myns.MsgHeader..GetMsgLength
-// Message length (uses length field)
-inline i32 myns::GetMsgLength(const myns::MsgHeader& parent) {
-    return i32(const_cast<myns::MsgHeader&>(parent).length);
-}
-
-// --- myns.MsgHeader..GetMsgMemptr
-// Memptr encompassing the message (uses length field)
-inline algo::memptr myns::GetMsgMemptr(const myns::MsgHeader& row) {
-    return algo::memptr((u8*)&row, i32(const_cast<myns::MsgHeader&>(row).length));
-}
-
-// --- myns.MsgHeader..Init
-// Set all fields to initial values.
-inline void myns::MsgHeader_Init(myns::MsgHeader& parent) {
-    parent.type = u8(0);
-    parent.length = u8(0);
-}
-
-// --- myns.MsgHeader..Ctor
-inline  myns::MsgHeader::MsgHeader() {
-    myns::MsgHeader_Init(*this);
-}
-
-// --- myns.MsgHeader..FieldwiseCtor
-inline  myns::MsgHeader::MsgHeader(u8 in_type, u8 in_length)
-    : type(in_type)
-    , length(in_length)
- {
-}
-
 // --- myns.MsgHeaderMsgsCase.value.GetEnum
 // Get value of field as enum type
 inline myns_MsgHeaderMsgsCaseEnum myns::value_GetEnum(const myns::MsgHeaderMsgsCase& parent) {
@@ -711,6 +889,11 @@ inline  myns::TableId::TableId(myns_TableIdEnum arg) {
     this->value = i32(arg);
 }
 
+inline algo::cstring &algo::operator <<(algo::cstring &str, const myns::MsgHeader &row) {// cfmt:myns.MsgHeader.String
+    myns::MsgHeader_Print(const_cast<myns::MsgHeader&>(row), str);
+    return str;
+}
+
 inline algo::cstring &algo::operator <<(algo::cstring &str, const myns::trace &row) {// cfmt:myns.trace.String
     myns::trace_Print(const_cast<myns::trace&>(row), str);
     return str;
@@ -718,11 +901,6 @@ inline algo::cstring &algo::operator <<(algo::cstring &str, const myns::trace &r
 
 inline algo::cstring &algo::operator <<(algo::cstring &str, const myns::FieldId &row) {// cfmt:myns.FieldId.String
     myns::FieldId_Print(const_cast<myns::FieldId&>(row), str);
-    return str;
-}
-
-inline algo::cstring &algo::operator <<(algo::cstring &str, const myns::MsgHeader &row) {// cfmt:myns.MsgHeader.String
-    myns::MsgHeader_Print(const_cast<myns::MsgHeader&>(row), str);
     return str;
 }
 

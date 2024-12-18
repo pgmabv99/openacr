@@ -61,9 +61,33 @@ const char *myns_help =
 
 } // namespace myns
 namespace myns { // gen:ns_print_proto
+    // Internal function to scan for a message
+    //
+    // func:myns.Client.in.ScanMsg
+    static void          in_ScanMsg(myns::Client& client) __attribute__((nothrow));
+    // Internal function to shift data left
+    // Shift existing bytes over to the beginning of the buffer
+    // func:myns.Client.in.Shift
+    static void          in_Shift(myns::Client& client) __attribute__((nothrow));
     // Load statically available data into tables, register tables and database.
     // func:myns.FDb._db.InitReflection
     static void          InitReflection();
+    // First element of index changed.
+    // func:myns.FDb.cd_fdin_eof.FirstChanged
+    static void          cd_fdin_eof_FirstChanged() __attribute__((nothrow));
+    // Update cycles count from previous clock capture
+    // func:myns.FDb.cd_fdin_eof.UpdateCycles
+    inline static void   cd_fdin_eof_UpdateCycles() __attribute__((nothrow));
+    // func:myns.FDb.cd_fdin_eof.Call
+    inline static void   cd_fdin_eof_Call() __attribute__((nothrow));
+    // First element of index changed.
+    // func:myns.FDb.cd_fdin_read.FirstChanged
+    static void          cd_fdin_read_FirstChanged() __attribute__((nothrow));
+    // Update cycles count from previous clock capture
+    // func:myns.FDb.cd_fdin_read.UpdateCycles
+    inline static void   cd_fdin_read_UpdateCycles() __attribute__((nothrow));
+    // func:myns.FDb.cd_fdin_read.Call
+    inline static void   cd_fdin_read_Call() __attribute__((nothrow));
     // Update cycles count from previous clock capture
     // func:myns.FDb.sched1.UpdateCycles
     inline static void   sched1_UpdateCycles() __attribute__((nothrow));
@@ -86,9 +110,330 @@ namespace myns { // gen:ns_print_proto
     inline static void   SizeCheck();
 } // gen:ns_print_proto
 
+// --- myns.MsgHeader.type.ToCstr
+// Convert numeric value of field to one of predefined string constants.
+// If string is found, return a static C string. Otherwise, return NULL.
+const char* myns::type_ToCstr(const myns::MsgHeader& in) {
+    const char *ret = NULL;
+    switch(type_GetEnum(in)) {
+        case myns_MsgHeader_type_myns_NewOrderReqMsg: ret = "myns.NewOrderReqMsg";  break;
+    }
+    return ret;
+}
+
+// --- myns.MsgHeader.type.Print
+// Convert type to a string. First, attempt conversion to a known string.
+// If no string matches, print type as a numeric value.
+void myns::type_Print(const myns::MsgHeader& in, algo::cstring &lhs) {
+    const char *strval = type_ToCstr(in);
+    if (strval) {
+        lhs << strval;
+    } else {
+        lhs << in.type;
+    }
+}
+
+// --- myns.MsgHeader.type.SetStrptrMaybe
+// Convert string to field.
+// If the string is invalid, do not modify field and return false.
+// In case of success, return true
+bool myns::type_SetStrptrMaybe(myns::MsgHeader& in, algo::strptr rhs) {
+    bool ret = false;
+    switch (elems_N(rhs)) {
+        case 19: {
+            switch (algo::ReadLE64(rhs.elems)) {
+                case LE_STR8('m','y','n','s','.','N','e','w'): {
+                    if (memcmp(rhs.elems+8,"OrderReqMsg",11)==0) { type_SetEnum(in,myns_MsgHeader_type_myns_NewOrderReqMsg); ret = true; break; }
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    return ret;
+}
+
+// --- myns.MsgHeader.type.SetStrptr
+// Convert string to field.
+// If the string is invalid, set numeric value to DFLT
+void myns::type_SetStrptr(myns::MsgHeader& in, algo::strptr rhs, myns_MsgHeader_type_Enum dflt) {
+    if (!type_SetStrptrMaybe(in,rhs)) type_SetEnum(in,dflt);
+}
+
+// --- myns.MsgHeader.type.ReadStrptrMaybe
+// Convert string to field. Return success value
+bool myns::type_ReadStrptrMaybe(myns::MsgHeader& in, algo::strptr rhs) {
+    bool retval = false;
+    retval = type_SetStrptrMaybe(in,rhs); // try symbol conversion
+    if (!retval) { // didn't work? try reading as underlying type
+        retval = u8_ReadStrptrMaybe(in.type,rhs);
+    }
+    return retval;
+}
+
+// --- myns.MsgHeader..ReadFieldMaybe
+bool myns::MsgHeader_ReadFieldMaybe(myns::MsgHeader& parent, algo::strptr field, algo::strptr strval) {
+    bool retval = true;
+    myns::FieldId field_id;
+    (void)value_SetStrptrMaybe(field_id,field);
+    switch(field_id) {
+        case myns_FieldId_type: {
+            retval = type_ReadStrptrMaybe(parent, strval);
+            break;
+        }
+        case myns_FieldId_length: {
+            retval = false;
+            break;
+        }
+        default: break;
+    }
+    if (!retval) {
+        algo_lib::AppendErrtext("attr",field);
+    }
+    return retval;
+}
+
+// --- myns.MsgHeader..ReadStrptrMaybe
+// Read fields of myns::MsgHeader from an ascii string.
+// The format of the string is an ssim Tuple
+bool myns::MsgHeader_ReadStrptrMaybe(myns::MsgHeader &parent, algo::strptr in_str) {
+    bool retval = true;
+    retval = algo::StripTypeTag(in_str, "myns.MsgHeader");
+    ind_beg(algo::Attr_curs, attr, in_str) {
+        retval = retval && MsgHeader_ReadFieldMaybe(parent, attr.name, attr.value);
+    }ind_end;
+    return retval;
+}
+
+// --- myns.MsgHeader..Print
+// print string representation of ROW to string STR
+// cfmt:myns.MsgHeader.String  printfmt:Tuple
+void myns::MsgHeader_Print(myns::MsgHeader& row, algo::cstring& str) {
+    algo::tempstr temp;
+    str << "myns.MsgHeader";
+    (void)row;//only to avoid -Wunused-parameter
+}
+
+// --- myns.Client.in.BeginRead
+// Attach fbuf to Iohook for reading
+// Attach file descriptor and begin reading using edge-triggered epoll.
+// File descriptor becomes owned by myns::Client.in via FIohook field.
+// Whenever the file descriptor becomes readable, insert client into cd_fdin_read.
+void myns::in_BeginRead(myns::Client& client, algo::Fildes fd) {
+    callback_Set1(client.in_iohook, client, myns::cd_fdin_read_Insert);
+    client.in_iohook.fildes = fd;
+    IOEvtFlags flags;
+    read_Set(flags, true);
+    if (client.in_epoll_enable) {
+        algo_lib::IohookAdd(client.in_iohook, flags);
+    } else {
+        myns::cd_fdin_read_Insert(client);
+    }
+}
+
+// --- myns.Client.in.EndRead
+// Set EOF flag
+void myns::in_EndRead(myns::Client& client) {
+    if (ValidQ(client.in_iohook.fildes)) {
+        client.in_eof = true;
+        myns::cd_fdin_read_Insert(client);
+    }
+}
+
+// --- myns.Client.in.GetMsg
+// Detect incoming message in buffer and return it
+// Look for valid message at current position in the buffer.
+// If message is already there, return a pointer to it. Do not skip message (call SkipMsg to do that).
+// If there is no message, read once from underlying file descriptor and try again.
+// The message is found by looking for delimiter '
+// '.
+// The return value is an aryptr. If ret.elems is non-NULL, the message is valid (possibly empty).
+// If ret.elems is NULL, no message can be extracted from buffer.
+// The returned aryptr excludes the trailing deliminter.
+// SkipMsg will skip both the line and the deliminter.
+// A partial line at the end of input is NOT returned (TODO?)
+// 
+algo::aryptr<myns::MsgHeader> myns::in_GetMsg(myns::Client& client) {
+    algo::aryptr<myns::MsgHeader> ret;
+    if (!client.in_msgvalid) {
+        in_ScanMsg(client);
+        if (!client.in_msgvalid) {
+            bool readable = in_Refill(client);
+            if (readable) {
+                in_ScanMsg(client);
+            }
+        }
+    }
+    myns::MsgHeader *hdr = (myns::MsgHeader*)(client.in_elems + client.in_start);
+    if (client.in_msgvalid) {
+        ret.elems = hdr;
+        ret.n_elems = client.in_msglen;
+    }
+    if (!client.in_msgvalid && client.in_eof) { // all messages processed
+        myns::cd_fdin_eof_Insert(client);
+    }
+    return ret;
+}
+
+// --- myns.Client.in.Refill
+// Refill buffer. Return false if no further refill possible (input buffer exhausted)
+bool myns::in_Refill(myns::Client& client) {
+    bool readable = ValidQ(client.in_iohook.fildes);
+    if (readable) {
+        int fd     = client.in_iohook.fildes.value;
+        i32 max    = in_Max(client);
+        i32 end    = client.in_end;
+        i32 nbytes = end - client.in_start; // # bytes currently in buffer
+        i32 nfree  = max - end; // bytes available at the end of buffer
+        if (nbytes == 0 || nfree == 0) { // make more room for reading (or take advantage of free shift)
+            in_Shift(client);
+            end = client.in_end;
+            nfree = max - end;
+        }
+        ssize_t ret         = read(fd, client.in_elems + end, nfree);
+        readable            = !(ret < 0 && errno == EAGAIN);
+        bool error          = ret < 0 && errno != EAGAIN; // detect permanent error on this fd
+        bool eof            = error || (ret == 0 && nfree > 0);
+        client.in_end += i32_Max(ret,0); // new end of bytes
+        if (error) {
+            client.in_err = algo::FromErrno(errno); // fetch errno
+        }
+        client.in_eof |= eof;
+    }
+    if (!readable && client.in_epoll_enable) {
+        myns::cd_fdin_read_Remove(client);
+    }
+    return readable;
+}
+
+// --- myns.Client.in.RemoveAll
+// Empty bfufer
+// Discard contents of the buffer.
+void myns::in_RemoveAll(myns::Client& client) {
+    client.in_start    = 0;
+    client.in_end      = 0;
+    client.in_msgvalid = false;
+}
+
+// --- myns.Client.in.ScanMsg
+// Internal function to scan for a message
+// 
+static void myns::in_ScanMsg(myns::Client& client) {
+    myns::MsgHeader *hdr = (myns::MsgHeader*)(client.in_elems + client.in_start);
+    i32 avail = in_N(client);
+    i32 msglen;
+    bool found = false;
+    // scan for delimiter starting from the previous place where we left off.
+    // at the end, save offset back to client so we don't have to re-scan.
+    // returned message length **does not include delimiter**.
+    // a line that exceeds buffer length is not returned.
+    for (msglen = client.in_msglen; msglen < avail; msglen += sizeof(myns::MsgHeader)) {
+        if (hdr[msglen] == '
+        ') { // delimiter?
+            found = true;
+            break;
+        }
+    }
+    if (!found && msglen >= in_Max(client)) {
+        client.in_eof = true; // cause user to detect eof
+        client.in_err = algo::FromErrno(E2BIG); // argument list too big -- closest error code
+    }
+    client.in_msglen = msglen;
+    client.in_msgvalid = found;
+}
+
+// --- myns.Client.in.Shift
+// Internal function to shift data left
+// Shift existing bytes over to the beginning of the buffer
+static void myns::in_Shift(myns::Client& client) {
+    i32 start = client.in_start;
+    i32 bytes_n = client.in_end - start;
+    if (bytes_n > 0) {
+        memmove(client.in_elems, client.in_elems + start, bytes_n);
+    }
+    client.in_end = bytes_n;
+    client.in_start = 0;
+}
+
+// --- myns.Client.in.SkipBytes
+// Skip N bytes when reading
+// Mark some buffer contents as read.
+// 
+void myns::in_SkipBytes(myns::Client& client, int n) {
+    int avail = client.in_end - client.in_start;
+    n = i32_Min(n,avail);
+    client.in_start += n;
+    client.in_msgvalid = false;
+}
+
+// --- myns.Client.in.SkipMsg
+// Skip current message, if any
+// Skip current message, if any.
+void myns::in_SkipMsg(myns::Client& client) {
+    if (client.in_msgvalid) {
+        int skip = client.in_msglen;
+        skip += ssizeof(myns::MsgHeader); // delimiter
+        i32 start = client.in_start;
+        start += skip;
+        client.in_start = start;
+        client.in_msgvalid = false;
+        client.in_msglen   = 0; // reset message length -- important for delimited streams
+    }
+}
+
+// --- myns.Client.in.WriteAll
+// Attempt to write buffer contents to fd
+// Write bytes to the buffer. If the entire block is written, return true,
+// Otherwise return false.
+// Bytes in the buffer are potentially shifted left to make room for the message.
+// 
+bool myns::in_WriteAll(myns::Client& client, u8 *in, i32 in_n) {
+    int max = in_Max(client);
+    // check if message doesn't fit. if so, shift bytes over.
+    if (client.in_end + in_n > max) {
+        in_Shift(client);
+    }
+    // now try to write the message.
+    i32 end = client.in_end;
+    bool fits = end + in_n <= max;
+    if (fits && in_n > 0) {
+        memcpy(client.in_elems + end, in, in_n);
+        client.in_end = end + in_n;
+    }
+    return fits;
+}
+
+// --- myns.Client.in.XrefMaybe
+// Insert row into all appropriate indices. If error occurs, store error
+// in algo_lib::_db.errtext and return false. Caller must Delete or Unref such row.
+bool myns::in_XrefMaybe(myns::MsgHeader &row) {
+    bool retval = true;
+    (void)row;
+    return retval;
+}
+
+// --- myns.Client..Init
+// Set all fields to initial values.
+void myns::Client_Init(myns::Client& client) {
+    client.in_end = 0; // in: initialize
+    client.in_start = 0; // in: initialize
+    client.in_eof = false; // in: initialize
+    client.in_msgvalid = false; // in: initialize
+    client.in_msglen = 0; // in: initialize
+    client.in_epoll_enable = true; // in: initialize
+    client.cd_fdin_eof_next = (myns::Client*)-1; // (myns.FDb.cd_fdin_eof) not-in-list
+    client.cd_fdin_eof_prev = NULL; // (myns.FDb.cd_fdin_eof)
+    client.cd_fdin_read_next = (myns::Client*)-1; // (myns.FDb.cd_fdin_read) not-in-list
+    client.cd_fdin_read_prev = NULL; // (myns.FDb.cd_fdin_read)
+    client.client_next = (myns::Client*)-1; // (myns.FDb.client) not-in-tpool's freelist
+    client.ind_client_next = (myns::Client*)-1; // (myns.FDb.ind_client) not-in-hash
+}
+
 // --- myns.Client..Uninit
 void myns::Client_Uninit(myns::Client& client) {
     myns::Client &row = client; (void)row;
+    cd_fdin_eof_Remove(row); // remove client from index cd_fdin_eof
+    cd_fdin_read_Remove(row); // remove client from index cd_fdin_read
     ind_client_Remove(row); // remove client from index ind_client
 }
 
@@ -252,6 +597,8 @@ void myns::MainLoop() {
 // --- myns.FDb._db.Step
 // Main step
 void myns::Step() {
+    cd_fdin_eof_Call();
+    cd_fdin_read_Call();
     sched1_Call();
     zd_order_Call();
 }
@@ -379,6 +726,234 @@ void myns::Steps() {
 bool myns::_db_XrefMaybe() {
     bool retval = true;
     return retval;
+}
+
+// --- myns.FDb.cd_fdin_eof.Insert
+// Insert row into linked list. If row is already in linked list, do nothing.
+void myns::cd_fdin_eof_Insert(myns::Client& row) {
+    if (!cd_fdin_eof_InLlistQ(row)) {
+        if (_db.cd_fdin_eof_head) {
+            row.cd_fdin_eof_next = _db.cd_fdin_eof_head;
+            row.cd_fdin_eof_prev = _db.cd_fdin_eof_head->cd_fdin_eof_prev;
+            row.cd_fdin_eof_prev->cd_fdin_eof_next = &row;
+            row.cd_fdin_eof_next->cd_fdin_eof_prev = &row;
+        } else {
+            row.cd_fdin_eof_next = &row;
+            row.cd_fdin_eof_prev = &row;
+            _db.cd_fdin_eof_head = &row;
+        }
+        _db.cd_fdin_eof_n++;
+        if (_db.cd_fdin_eof_head == &row) {
+            cd_fdin_eof_FirstChanged();
+        }
+    }
+}
+
+// --- myns.FDb.cd_fdin_eof.Remove
+// Remove element from index. If element is not in index, do nothing.
+void myns::cd_fdin_eof_Remove(myns::Client& row) {
+    if (cd_fdin_eof_InLlistQ(row)) {
+        myns::Client* old_head       = _db.cd_fdin_eof_head;
+        (void)old_head; // in case it's not used
+        myns::Client *oldnext = row.cd_fdin_eof_next;
+        myns::Client *oldprev = row.cd_fdin_eof_prev;
+        oldnext->cd_fdin_eof_prev = oldprev; // remove element from list
+        oldprev->cd_fdin_eof_next = oldnext;
+        _db.cd_fdin_eof_n--;  // adjust count
+        if (&row == _db.cd_fdin_eof_head) {
+            _db.cd_fdin_eof_head = oldnext==&row ? NULL : oldnext; // adjust list head
+        }
+        row.cd_fdin_eof_next = (myns::Client*)-1; // mark element as not-in-list);
+        row.cd_fdin_eof_prev = NULL; // clear back-pointer
+        if (old_head != _db.cd_fdin_eof_head) {
+            cd_fdin_eof_FirstChanged();
+        }
+    }
+}
+
+// --- myns.FDb.cd_fdin_eof.RemoveAll
+// Empty the index. (The rows are not deleted)
+void myns::cd_fdin_eof_RemoveAll() {
+    myns::Client* row = _db.cd_fdin_eof_head;
+    myns::Client* head = _db.cd_fdin_eof_head;
+    _db.cd_fdin_eof_head = NULL;
+    _db.cd_fdin_eof_n = 0;
+    bool do_fire = (NULL != row);
+    while (row) {
+        myns::Client* row_next = row->cd_fdin_eof_next;
+        row->cd_fdin_eof_next  = (myns::Client*)-1;
+        row->cd_fdin_eof_prev  = NULL;
+        row = row_next != head  ? row_next : NULL;
+    }
+    if (do_fire) {
+        cd_fdin_eof_FirstChanged();
+    }
+}
+
+// --- myns.FDb.cd_fdin_eof.RemoveFirst
+// If linked list is empty, return NULL. Otherwise unlink and return pointer to first element.
+// Call FirstChanged trigger.
+myns::Client* myns::cd_fdin_eof_RemoveFirst() {
+    myns::Client *row = NULL;
+    row = _db.cd_fdin_eof_head;
+    if (row) {
+        bool hasmore = row!=row->cd_fdin_eof_next;
+        _db.cd_fdin_eof_head = hasmore ? row->cd_fdin_eof_next : NULL;
+        row->cd_fdin_eof_next->cd_fdin_eof_prev = row->cd_fdin_eof_prev;
+        row->cd_fdin_eof_prev->cd_fdin_eof_next = row->cd_fdin_eof_next;
+        row->cd_fdin_eof_prev = NULL;
+        _db.cd_fdin_eof_n--;
+        row->cd_fdin_eof_next = (myns::Client*)-1; // mark as not-in-list
+        cd_fdin_eof_FirstChanged();
+    }
+    return row;
+}
+
+// --- myns.FDb.cd_fdin_eof.RotateFirst
+// If linked list is empty, return NULL.
+// Otherwise return head item and advance head to the next item.
+myns::Client* myns::cd_fdin_eof_RotateFirst() {
+    myns::Client *row = NULL;
+    row = _db.cd_fdin_eof_head;
+    if (row) {
+        _db.cd_fdin_eof_head = row->cd_fdin_eof_next;
+    }
+    return row;
+}
+
+// --- myns.FDb.cd_fdin_eof.FirstChanged
+// First element of index changed.
+static void myns::cd_fdin_eof_FirstChanged() {
+}
+
+// --- myns.FDb.cd_fdin_eof.UpdateCycles
+// Update cycles count from previous clock capture
+inline static void myns::cd_fdin_eof_UpdateCycles() {
+    u64 cur_cycles                      = algo::get_cycles();
+    algo_lib::_db.clock                 = algo::SchedTime(cur_cycles);
+}
+
+// --- myns.FDb.cd_fdin_eof.Call
+inline static void myns::cd_fdin_eof_Call() {
+    if (!myns::cd_fdin_eof_EmptyQ()) { // fstep:myns.FDb.cd_fdin_eof
+        myns::cd_fdin_eof_Step(); // steptype:Inline: call function on every step
+        cd_fdin_eof_UpdateCycles();
+        algo_lib::_db.next_loop = algo_lib::_db.clock;
+    }
+}
+
+// --- myns.FDb.cd_fdin_read.Insert
+// Insert row into linked list. If row is already in linked list, do nothing.
+void myns::cd_fdin_read_Insert(myns::Client& row) {
+    if (!cd_fdin_read_InLlistQ(row)) {
+        if (_db.cd_fdin_read_head) {
+            row.cd_fdin_read_next = _db.cd_fdin_read_head;
+            row.cd_fdin_read_prev = _db.cd_fdin_read_head->cd_fdin_read_prev;
+            row.cd_fdin_read_prev->cd_fdin_read_next = &row;
+            row.cd_fdin_read_next->cd_fdin_read_prev = &row;
+        } else {
+            row.cd_fdin_read_next = &row;
+            row.cd_fdin_read_prev = &row;
+            _db.cd_fdin_read_head = &row;
+        }
+        _db.cd_fdin_read_n++;
+        if (_db.cd_fdin_read_head == &row) {
+            cd_fdin_read_FirstChanged();
+        }
+    }
+}
+
+// --- myns.FDb.cd_fdin_read.Remove
+// Remove element from index. If element is not in index, do nothing.
+void myns::cd_fdin_read_Remove(myns::Client& row) {
+    if (cd_fdin_read_InLlistQ(row)) {
+        myns::Client* old_head       = _db.cd_fdin_read_head;
+        (void)old_head; // in case it's not used
+        myns::Client *oldnext = row.cd_fdin_read_next;
+        myns::Client *oldprev = row.cd_fdin_read_prev;
+        oldnext->cd_fdin_read_prev = oldprev; // remove element from list
+        oldprev->cd_fdin_read_next = oldnext;
+        _db.cd_fdin_read_n--;  // adjust count
+        if (&row == _db.cd_fdin_read_head) {
+            _db.cd_fdin_read_head = oldnext==&row ? NULL : oldnext; // adjust list head
+        }
+        row.cd_fdin_read_next = (myns::Client*)-1; // mark element as not-in-list);
+        row.cd_fdin_read_prev = NULL; // clear back-pointer
+        if (old_head != _db.cd_fdin_read_head) {
+            cd_fdin_read_FirstChanged();
+        }
+    }
+}
+
+// --- myns.FDb.cd_fdin_read.RemoveAll
+// Empty the index. (The rows are not deleted)
+void myns::cd_fdin_read_RemoveAll() {
+    myns::Client* row = _db.cd_fdin_read_head;
+    myns::Client* head = _db.cd_fdin_read_head;
+    _db.cd_fdin_read_head = NULL;
+    _db.cd_fdin_read_n = 0;
+    bool do_fire = (NULL != row);
+    while (row) {
+        myns::Client* row_next = row->cd_fdin_read_next;
+        row->cd_fdin_read_next  = (myns::Client*)-1;
+        row->cd_fdin_read_prev  = NULL;
+        row = row_next != head  ? row_next : NULL;
+    }
+    if (do_fire) {
+        cd_fdin_read_FirstChanged();
+    }
+}
+
+// --- myns.FDb.cd_fdin_read.RemoveFirst
+// If linked list is empty, return NULL. Otherwise unlink and return pointer to first element.
+// Call FirstChanged trigger.
+myns::Client* myns::cd_fdin_read_RemoveFirst() {
+    myns::Client *row = NULL;
+    row = _db.cd_fdin_read_head;
+    if (row) {
+        bool hasmore = row!=row->cd_fdin_read_next;
+        _db.cd_fdin_read_head = hasmore ? row->cd_fdin_read_next : NULL;
+        row->cd_fdin_read_next->cd_fdin_read_prev = row->cd_fdin_read_prev;
+        row->cd_fdin_read_prev->cd_fdin_read_next = row->cd_fdin_read_next;
+        row->cd_fdin_read_prev = NULL;
+        _db.cd_fdin_read_n--;
+        row->cd_fdin_read_next = (myns::Client*)-1; // mark as not-in-list
+        cd_fdin_read_FirstChanged();
+    }
+    return row;
+}
+
+// --- myns.FDb.cd_fdin_read.RotateFirst
+// If linked list is empty, return NULL.
+// Otherwise return head item and advance head to the next item.
+myns::Client* myns::cd_fdin_read_RotateFirst() {
+    myns::Client *row = NULL;
+    row = _db.cd_fdin_read_head;
+    if (row) {
+        _db.cd_fdin_read_head = row->cd_fdin_read_next;
+    }
+    return row;
+}
+
+// --- myns.FDb.cd_fdin_read.FirstChanged
+// First element of index changed.
+static void myns::cd_fdin_read_FirstChanged() {
+}
+
+// --- myns.FDb.cd_fdin_read.UpdateCycles
+// Update cycles count from previous clock capture
+inline static void myns::cd_fdin_read_UpdateCycles() {
+    u64 cur_cycles                      = algo::get_cycles();
+    algo_lib::_db.clock                 = algo::SchedTime(cur_cycles);
+}
+
+// --- myns.FDb.cd_fdin_read.Call
+inline static void myns::cd_fdin_read_Call() {
+    if (!myns::cd_fdin_read_EmptyQ()) { // fstep:myns.FDb.cd_fdin_read
+        myns::cd_fdin_read_Step(); // steptype:Inline: call function on every step
+        cd_fdin_read_UpdateCycles();
+        algo_lib::_db.next_loop = algo_lib::_db.clock;
+    }
 }
 
 // --- myns.FDb.sched1.UpdateCycles
@@ -1311,6 +1886,10 @@ inline static i32 myns::trace_N() {
 // --- myns.FDb..Init
 // Set all fields to initial values.
 void myns::FDb_Init() {
+    _db.cd_fdin_eof_head = NULL; // (myns.FDb.cd_fdin_eof)
+    _db.cd_fdin_eof_n = 0; // (myns.FDb.cd_fdin_eof)
+    _db.cd_fdin_read_head = NULL; // (myns.FDb.cd_fdin_read)
+    _db.cd_fdin_read_n = 0; // (myns.FDb.cd_fdin_read)
     _db.sched1 = bool(true);
     myns::_db.sched1_delay = algo::ToSchedTime(5); // initialize fstep delay (myns.FDb.sched1)
     // client: initialize Tpool
@@ -1603,110 +2182,6 @@ void myns::FieldId_Print(myns::FieldId& row, algo::cstring& str) {
     myns::value_Print(row, str);
 }
 
-// --- myns.MsgHeader.type.ToCstr
-// Convert numeric value of field to one of predefined string constants.
-// If string is found, return a static C string. Otherwise, return NULL.
-const char* myns::type_ToCstr(const myns::MsgHeader& parent) {
-    const char *ret = NULL;
-    switch(type_GetEnum(parent)) {
-        case myns_MsgHeader_type_myns_NewOrderReqMsg: ret = "myns.NewOrderReqMsg";  break;
-    }
-    return ret;
-}
-
-// --- myns.MsgHeader.type.Print
-// Convert type to a string. First, attempt conversion to a known string.
-// If no string matches, print type as a numeric value.
-void myns::type_Print(const myns::MsgHeader& parent, algo::cstring &lhs) {
-    const char *strval = type_ToCstr(parent);
-    if (strval) {
-        lhs << strval;
-    } else {
-        lhs << parent.type;
-    }
-}
-
-// --- myns.MsgHeader.type.SetStrptrMaybe
-// Convert string to field.
-// If the string is invalid, do not modify field and return false.
-// In case of success, return true
-bool myns::type_SetStrptrMaybe(myns::MsgHeader& parent, algo::strptr rhs) {
-    bool ret = false;
-    switch (elems_N(rhs)) {
-        case 19: {
-            switch (algo::ReadLE64(rhs.elems)) {
-                case LE_STR8('m','y','n','s','.','N','e','w'): {
-                    if (memcmp(rhs.elems+8,"OrderReqMsg",11)==0) { type_SetEnum(parent,myns_MsgHeader_type_myns_NewOrderReqMsg); ret = true; break; }
-                    break;
-                }
-            }
-            break;
-        }
-    }
-    return ret;
-}
-
-// --- myns.MsgHeader.type.SetStrptr
-// Convert string to field.
-// If the string is invalid, set numeric value to DFLT
-void myns::type_SetStrptr(myns::MsgHeader& parent, algo::strptr rhs, myns_MsgHeader_type_Enum dflt) {
-    if (!type_SetStrptrMaybe(parent,rhs)) type_SetEnum(parent,dflt);
-}
-
-// --- myns.MsgHeader.type.ReadStrptrMaybe
-// Convert string to field. Return success value
-bool myns::type_ReadStrptrMaybe(myns::MsgHeader& parent, algo::strptr rhs) {
-    bool retval = false;
-    retval = type_SetStrptrMaybe(parent,rhs); // try symbol conversion
-    if (!retval) { // didn't work? try reading as underlying type
-        retval = u8_ReadStrptrMaybe(parent.type,rhs);
-    }
-    return retval;
-}
-
-// --- myns.MsgHeader..ReadFieldMaybe
-bool myns::MsgHeader_ReadFieldMaybe(myns::MsgHeader& parent, algo::strptr field, algo::strptr strval) {
-    bool retval = true;
-    myns::FieldId field_id;
-    (void)value_SetStrptrMaybe(field_id,field);
-    switch(field_id) {
-        case myns_FieldId_type: {
-            retval = type_ReadStrptrMaybe(parent, strval);
-            break;
-        }
-        case myns_FieldId_length: {
-            retval = false;
-            break;
-        }
-        default: break;
-    }
-    if (!retval) {
-        algo_lib::AppendErrtext("attr",field);
-    }
-    return retval;
-}
-
-// --- myns.MsgHeader..ReadStrptrMaybe
-// Read fields of myns::MsgHeader from an ascii string.
-// The format of the string is an ssim Tuple
-bool myns::MsgHeader_ReadStrptrMaybe(myns::MsgHeader &parent, algo::strptr in_str) {
-    bool retval = true;
-    retval = algo::StripTypeTag(in_str, "myns.MsgHeader");
-    ind_beg(algo::Attr_curs, attr, in_str) {
-        retval = retval && MsgHeader_ReadFieldMaybe(parent, attr.name, attr.value);
-    }ind_end;
-    return retval;
-}
-
-// --- myns.MsgHeader..Print
-// print string representation of ROW to string STR
-// cfmt:myns.MsgHeader.String  printfmt:Tuple
-void myns::MsgHeader_Print(myns::MsgHeader& row, algo::cstring& str) {
-    algo::tempstr temp;
-    str << "myns.MsgHeader";
-    (void)row;//only to avoid -Wunused-parameter
-}
-
 // --- myns.MsgHeaderMsgsCase.value.ToCstr
 // Convert numeric value of field to one of predefined string constants.
 // If string is found, return a static C string. Otherwise, return NULL.
@@ -1945,7 +2420,6 @@ inline static void myns::SizeCheck() {
 // --- myns...StaticCheck
 void myns::StaticCheck() {
     algo_assert(_offset_of(myns::FieldId, value) + sizeof(((myns::FieldId*)0)->value) == sizeof(myns::FieldId));
-    algo_assert(_offset_of(myns::MsgHeader, length) + sizeof(((myns::MsgHeader*)0)->length) == sizeof(myns::MsgHeader));
     algo_assert(_offset_of(myns::MsgHeaderMsgsCase, value) + sizeof(((myns::MsgHeaderMsgsCase*)0)->value) == sizeof(myns::MsgHeaderMsgsCase));
     algo_assert(_offset_of(myns::MsgHeader_curs, msglen) + sizeof(((myns::MsgHeader_curs*)0)->msglen) == sizeof(myns::MsgHeader_curs));
     algo_assert(_offset_of(myns::NewOrderReqMsg, amt) + sizeof(((myns::NewOrderReqMsg*)0)->amt) == sizeof(myns::NewOrderReqMsg));

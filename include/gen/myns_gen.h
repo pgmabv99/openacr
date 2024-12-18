@@ -30,6 +30,15 @@
 //#pragma endinclude
 // gen:ns_enums
 
+// --- myns_MsgHeader_type_Enum
+
+enum myns_MsgHeader_type_Enum {                       // myns.MsgHeader.type
+     myns_MsgHeader_type_myns_NewOrderReqMsg   = 66   // From user: new order request
+};
+
+enum { myns_MsgHeader_type_Enum_N = 1 };
+
+
 // --- myns_FieldIdEnum
 
 enum myns_FieldIdEnum {           // myns.FieldId.value
@@ -42,15 +51,6 @@ enum myns_FieldIdEnum {           // myns.FieldId.value
 };
 
 enum { myns_FieldIdEnum_N = 6 };
-
-
-// --- myns_MsgHeader_type_Enum
-
-enum myns_MsgHeader_type_Enum {                       // myns.MsgHeader.type
-     myns_MsgHeader_type_myns_NewOrderReqMsg   = 66   // From user: new order request
-};
-
-enum { myns_MsgHeader_type_Enum_N = 1 };
 
 
 // --- myns_MsgHeaderMsgsCaseEnum
@@ -77,10 +77,12 @@ namespace myns { // gen:ns_tclass_field
 extern const char *myns_help;
 } // gen:ns_tclass_field
 // gen:ns_fwddecl2
-namespace mynsdb { struct Part; }
 namespace myns { struct MsgHeader; }
+namespace mynsdb { struct Part; }
 namespace myns { struct FPart; }
 namespace myns { struct NewOrderReqMsg; }
+namespace myns { struct _db_cd_fdin_eof_curs; }
+namespace myns { struct _db_cd_fdin_read_curs; }
 namespace myns { struct _db_part_curs; }
 namespace myns { struct _db_zd_part_curs; }
 namespace myns { struct _db_zd_order_curs; }
@@ -96,19 +98,99 @@ namespace myns { struct TableId; }
 namespace myns { extern struct myns::FDb _db; }
 namespace myns { // gen:ns_print_struct
 
+// --- myns.MsgHeader
+// create: myns.Client.in (Fbuf)
+// access: myns.NewOrderReqMsg.base (Base)
+// access: myns.MsgHeader_curs.msg (Ptr)
+#pragma pack(push,1)
+struct MsgHeader { // myns.MsgHeader
+    u8   type;     //   0
+    u8   length;   //   0
+    // func:myns.MsgHeader..Ctor
+    inline               MsgHeader() __attribute__((nothrow));
+    // func:myns.MsgHeader..FieldwiseCtor
+    explicit inline               MsgHeader(u8 in_type, u8 in_length) __attribute__((nothrow));
+};
+#pragma pack(pop)
+
+// Get value of field as enum type
+// func:myns.MsgHeader.type.GetEnum
+inline myns_MsgHeader_type_Enum type_GetEnum(const myns::MsgHeader& in) __attribute__((nothrow));
+// Set value of field from enum type.
+// func:myns.MsgHeader.type.SetEnum
+inline void          type_SetEnum(myns::MsgHeader& in, myns_MsgHeader_type_Enum rhs) __attribute__((nothrow));
+// Convert numeric value of field to one of predefined string constants.
+// If string is found, return a static C string. Otherwise, return NULL.
+// func:myns.MsgHeader.type.ToCstr
+const char*          type_ToCstr(const myns::MsgHeader& in) __attribute__((nothrow));
+// Convert type to a string. First, attempt conversion to a known string.
+// If no string matches, print type as a numeric value.
+// func:myns.MsgHeader.type.Print
+void                 type_Print(const myns::MsgHeader& in, algo::cstring &lhs) __attribute__((nothrow));
+// Convert string to field.
+// If the string is invalid, do not modify field and return false.
+// In case of success, return true
+// func:myns.MsgHeader.type.SetStrptrMaybe
+bool                 type_SetStrptrMaybe(myns::MsgHeader& in, algo::strptr rhs) __attribute__((nothrow));
+// Convert string to field.
+// If the string is invalid, set numeric value to DFLT
+// func:myns.MsgHeader.type.SetStrptr
+void                 type_SetStrptr(myns::MsgHeader& in, algo::strptr rhs, myns_MsgHeader_type_Enum dflt) __attribute__((nothrow));
+// Convert string to field. Return success value
+// func:myns.MsgHeader.type.ReadStrptrMaybe
+bool                 type_ReadStrptrMaybe(myns::MsgHeader& in, algo::strptr rhs) __attribute__((nothrow));
+
+// func:myns.MsgHeader..ReadFieldMaybe
+bool                 MsgHeader_ReadFieldMaybe(myns::MsgHeader& parent, algo::strptr field, algo::strptr strval) __attribute__((nothrow));
+// Read fields of myns::MsgHeader from an ascii string.
+// The format of the string is an ssim Tuple
+// func:myns.MsgHeader..ReadStrptrMaybe
+bool                 MsgHeader_ReadStrptrMaybe(myns::MsgHeader &parent, algo::strptr in_str) __attribute__((nothrow));
+// Message length (uses length field)
+// func:myns.MsgHeader..GetMsgLength
+inline i32           GetMsgLength(const myns::MsgHeader& parent) __attribute__((nothrow));
+// Memptr encompassing the message (uses length field)
+// func:myns.MsgHeader..GetMsgMemptr
+inline algo::memptr  GetMsgMemptr(const myns::MsgHeader& row) __attribute__((nothrow));
+// Set all fields to initial values.
+// func:myns.MsgHeader..Init
+inline void          MsgHeader_Init(myns::MsgHeader& in);
+// print string representation of ROW to string STR
+// cfmt:myns.MsgHeader.String  printfmt:Tuple
+// func:myns.MsgHeader..Print
+void                 MsgHeader_Print(myns::MsgHeader& row, algo::cstring& str) __attribute__((nothrow));
+
 // --- myns.Client
 // create: myns.FDb.client (Tpool)
+// global access: cd_fdin_eof (Llist)
+// global access: cd_fdin_read (Llist)
 // global access: ind_client (Thash, hash field client)
 struct Client { // myns.Client: client hook/socket
-    algo::Smallstr50    client;            //
-    algo_lib::FIohook   read;              //
-    algo::Smallstr50    lastbuff;          //
-    myns::Client*       client_next;       // Pointer to next free element int tpool
-    myns::Client*       ind_client_next;   // hash next
+    algo::Smallstr50    client;              //
+    algo_lib::FIohook   read;                //
+    u8                  in_elems[8192];      // pointer to elements of inline array
+    i32                 in_start;            // beginning of valid bytes (in bytes)
+    i32                 in_end;              // end of valid bytes (in bytes)
+    bool                in_eof;              // no more data will be written to buffer
+    algo::Errcode       in_err;              // system error code
+    bool                in_msgvalid;         // current message is valid
+    i32                 in_msglen;           // current message length
+    algo_lib::FIohook   in_iohook;           // edge-triggered hook for refilling buffer
+    bool                in_epoll_enable;     // use epoll?
+    enum { in_max = 8192 };
+    algo::Smallstr50    lastbuff;            //
+    myns::Client*       cd_fdin_eof_next;    // zslist link; -1 means not-in-list
+    myns::Client*       cd_fdin_eof_prev;    // previous element
+    myns::Client*       cd_fdin_read_next;   // zslist link; -1 means not-in-list
+    myns::Client*       cd_fdin_read_prev;   // previous element
+    myns::Client*       client_next;         // Pointer to next free element int tpool
+    myns::Client*       ind_client_next;     // hash next
     // value field myns.Client.read is not copiable
+    // field myns.Client.in prevents copy
     // func:myns.Client..AssignOp
     inline myns::Client& operator =(const myns::Client &rhs) = delete;
     // value field myns.Client.read is not copiable
+    // field myns.Client.in prevents copy
     // func:myns.Client..CopyCtor
     inline               Client(const myns::Client &rhs) = delete;
 private:
@@ -121,9 +203,66 @@ private:
     friend void                 client_Delete(myns::Client &row) __attribute__((nothrow));
 };
 
+// Attach fbuf to Iohook for reading
+// Attach file descriptor and begin reading using edge-triggered epoll.
+// File descriptor becomes owned by myns::Client.in via FIohook field.
+// Whenever the file descriptor becomes readable, insert client into cd_fdin_read.
+// func:myns.Client.in.BeginRead
+void                 in_BeginRead(myns::Client& client, algo::Fildes fd) __attribute__((nothrow));
+// Set EOF flag
+// func:myns.Client.in.EndRead
+void                 in_EndRead(myns::Client& client) __attribute__((nothrow));
+// Detect incoming message in buffer and return it
+// Look for valid message at current position in the buffer.
+// If message is already there, return a pointer to it. Do not skip message (call SkipMsg to do that).
+// If there is no message, read once from underlying file descriptor and try again.
+// The message is found by looking for delimiter '
+// '.
+// The return value is an aryptr. If ret.elems is non-NULL, the message is valid (possibly empty).
+// If ret.elems is NULL, no message can be extracted from buffer.
+// The returned aryptr excludes the trailing deliminter.
+// SkipMsg will skip both the line and the deliminter.
+// A partial line at the end of input is NOT returned (TODO?)
+//
+// func:myns.Client.in.GetMsg
+algo::aryptr<myns::MsgHeader> in_GetMsg(myns::Client& client) __attribute__((nothrow));
+// Return max. number of bytes in the buffer.
+// func:myns.Client.in.Max
+inline i32           in_Max(myns::Client& client) __attribute__((nothrow));
+// Return number of bytes in the buffer.
+// func:myns.Client.in.N
+inline i32           in_N(myns::Client& client) __attribute__((__warn_unused_result__, nothrow, pure));
+// Refill buffer. Return false if no further refill possible (input buffer exhausted)
+// func:myns.Client.in.Refill
+bool                 in_Refill(myns::Client& client) __attribute__((nothrow));
+// Empty bfufer
+// Discard contents of the buffer.
+// func:myns.Client.in.RemoveAll
+void                 in_RemoveAll(myns::Client& client) __attribute__((nothrow));
+// Skip N bytes when reading
+// Mark some buffer contents as read.
+//
+// func:myns.Client.in.SkipBytes
+void                 in_SkipBytes(myns::Client& client, int n) __attribute__((nothrow));
+// Skip current message, if any
+// Skip current message, if any.
+// func:myns.Client.in.SkipMsg
+void                 in_SkipMsg(myns::Client& client) __attribute__((nothrow));
+// Attempt to write buffer contents to fd
+// Write bytes to the buffer. If the entire block is written, return true,
+// Otherwise return false.
+// Bytes in the buffer are potentially shifted left to make room for the message.
+//
+// func:myns.Client.in.WriteAll
+bool                 in_WriteAll(myns::Client& client, u8 *in, i32 in_n) __attribute__((nothrow));
+// Insert row into all appropriate indices. If error occurs, store error
+// in algo_lib::_db.errtext and return false. Caller must Delete or Unref such row.
+// func:myns.Client.in.XrefMaybe
+bool                 in_XrefMaybe(myns::MsgHeader &row);
+
 // Set all fields to initial values.
 // func:myns.Client..Init
-inline void          Client_Init(myns::Client& client);
+void                 Client_Init(myns::Client& client);
 // func:myns.Client..Uninit
 void                 Client_Uninit(myns::Client& client) __attribute__((nothrow));
 
@@ -144,6 +283,10 @@ void                 trace_Print(myns::trace& row, algo::cstring& str) __attribu
 // create: myns.FDb._db (Global)
 struct FDb { // myns.FDb
     command::myns       cmdline;                    //
+    myns::Client*       cd_fdin_eof_head;           // zero-terminated doubly linked list
+    i32                 cd_fdin_eof_n;              // zero-terminated doubly linked list
+    myns::Client*       cd_fdin_read_head;          // zero-terminated doubly linked list
+    i32                 cd_fdin_read_n;             // zero-terminated doubly linked list
     bool                sched1;                     //   true
     algo::SchedTime     sched1_next;                // myns.FDb.sched1                       Next invocation time
     algo::SchedTime     sched1_delay;               // myns.FDb.sched1                       Delay between invocations
@@ -219,6 +362,96 @@ void                 Steps();
 // in algo_lib::_db.errtext and return false. Caller must Delete or Unref such row.
 // func:myns.FDb._db.XrefMaybe
 bool                 _db_XrefMaybe();
+
+// Return true if index is empty
+// func:myns.FDb.cd_fdin_eof.EmptyQ
+inline bool          cd_fdin_eof_EmptyQ() __attribute__((__warn_unused_result__, nothrow, pure));
+// If index empty, return NULL. Otherwise return pointer to first element in index
+// func:myns.FDb.cd_fdin_eof.First
+inline myns::Client* cd_fdin_eof_First() __attribute__((__warn_unused_result__, nothrow, pure));
+// Return true if row is in the linked list, false otherwise
+// func:myns.FDb.cd_fdin_eof.InLlistQ
+inline bool          cd_fdin_eof_InLlistQ(myns::Client& row) __attribute__((__warn_unused_result__, nothrow));
+// Insert row into linked list. If row is already in linked list, do nothing.
+// func:myns.FDb.cd_fdin_eof.Insert
+void                 cd_fdin_eof_Insert(myns::Client& row) __attribute__((nothrow));
+// If index empty, return NULL. Otherwise return pointer to last element in index
+// func:myns.FDb.cd_fdin_eof.Last
+inline myns::Client* cd_fdin_eof_Last() __attribute__((__warn_unused_result__, nothrow, pure));
+// Return number of items in the linked list
+// func:myns.FDb.cd_fdin_eof.N
+inline i32           cd_fdin_eof_N() __attribute__((__warn_unused_result__, nothrow, pure));
+// Return pointer to next element in the list
+// func:myns.FDb.cd_fdin_eof.Next
+inline myns::Client* cd_fdin_eof_Next(myns::Client &row) __attribute__((__warn_unused_result__, nothrow));
+// Return pointer to previous element in the list
+// func:myns.FDb.cd_fdin_eof.Prev
+inline myns::Client* cd_fdin_eof_Prev(myns::Client &row) __attribute__((__warn_unused_result__, nothrow));
+// Remove element from index. If element is not in index, do nothing.
+// func:myns.FDb.cd_fdin_eof.Remove
+void                 cd_fdin_eof_Remove(myns::Client& row) __attribute__((nothrow));
+// Empty the index. (The rows are not deleted)
+// func:myns.FDb.cd_fdin_eof.RemoveAll
+void                 cd_fdin_eof_RemoveAll() __attribute__((nothrow));
+// If linked list is empty, return NULL. Otherwise unlink and return pointer to first element.
+// Call FirstChanged trigger.
+// func:myns.FDb.cd_fdin_eof.RemoveFirst
+myns::Client*        cd_fdin_eof_RemoveFirst() __attribute__((nothrow));
+// If linked list is empty, return NULL.
+// Otherwise return head item and advance head to the next item.
+// func:myns.FDb.cd_fdin_eof.RotateFirst
+myns::Client*        cd_fdin_eof_RotateFirst() __attribute__((nothrow));
+// Return reference to last element in the index. No bounds checking.
+// func:myns.FDb.cd_fdin_eof.qLast
+inline myns::Client& cd_fdin_eof_qLast() __attribute__((__warn_unused_result__, nothrow));
+// func:myns.FDb.cd_fdin_eof.Step
+// this function is 'extrn' and implemented by user
+void                 cd_fdin_eof_Step() __attribute__((nothrow));
+
+// Return true if index is empty
+// func:myns.FDb.cd_fdin_read.EmptyQ
+inline bool          cd_fdin_read_EmptyQ() __attribute__((__warn_unused_result__, nothrow, pure));
+// If index empty, return NULL. Otherwise return pointer to first element in index
+// func:myns.FDb.cd_fdin_read.First
+inline myns::Client* cd_fdin_read_First() __attribute__((__warn_unused_result__, nothrow, pure));
+// Return true if row is in the linked list, false otherwise
+// func:myns.FDb.cd_fdin_read.InLlistQ
+inline bool          cd_fdin_read_InLlistQ(myns::Client& row) __attribute__((__warn_unused_result__, nothrow));
+// Insert row into linked list. If row is already in linked list, do nothing.
+// func:myns.FDb.cd_fdin_read.Insert
+void                 cd_fdin_read_Insert(myns::Client& row) __attribute__((nothrow));
+// If index empty, return NULL. Otherwise return pointer to last element in index
+// func:myns.FDb.cd_fdin_read.Last
+inline myns::Client* cd_fdin_read_Last() __attribute__((__warn_unused_result__, nothrow, pure));
+// Return number of items in the linked list
+// func:myns.FDb.cd_fdin_read.N
+inline i32           cd_fdin_read_N() __attribute__((__warn_unused_result__, nothrow, pure));
+// Return pointer to next element in the list
+// func:myns.FDb.cd_fdin_read.Next
+inline myns::Client* cd_fdin_read_Next(myns::Client &row) __attribute__((__warn_unused_result__, nothrow));
+// Return pointer to previous element in the list
+// func:myns.FDb.cd_fdin_read.Prev
+inline myns::Client* cd_fdin_read_Prev(myns::Client &row) __attribute__((__warn_unused_result__, nothrow));
+// Remove element from index. If element is not in index, do nothing.
+// func:myns.FDb.cd_fdin_read.Remove
+void                 cd_fdin_read_Remove(myns::Client& row) __attribute__((nothrow));
+// Empty the index. (The rows are not deleted)
+// func:myns.FDb.cd_fdin_read.RemoveAll
+void                 cd_fdin_read_RemoveAll() __attribute__((nothrow));
+// If linked list is empty, return NULL. Otherwise unlink and return pointer to first element.
+// Call FirstChanged trigger.
+// func:myns.FDb.cd_fdin_read.RemoveFirst
+myns::Client*        cd_fdin_read_RemoveFirst() __attribute__((nothrow));
+// If linked list is empty, return NULL.
+// Otherwise return head item and advance head to the next item.
+// func:myns.FDb.cd_fdin_read.RotateFirst
+myns::Client*        cd_fdin_read_RotateFirst() __attribute__((nothrow));
+// Return reference to last element in the index. No bounds checking.
+// func:myns.FDb.cd_fdin_read.qLast
+inline myns::Client& cd_fdin_read_qLast() __attribute__((__warn_unused_result__, nothrow));
+// func:myns.FDb.cd_fdin_read.Step
+// this function is 'extrn' and implemented by user
+void                 cd_fdin_read_Step() __attribute__((nothrow));
 
 // func:myns.FDb.sched1.Step
 // this function is 'extrn' and implemented by user
@@ -489,6 +722,30 @@ void                 zd_order_Step() __attribute__((nothrow));
 void                 zd_order_SetDelay(algo::SchedTime delay) __attribute__((nothrow));
 
 // cursor points to valid item
+// func:myns.FDb.cd_fdin_eof_curs.Reset
+inline void          _db_cd_fdin_eof_curs_Reset(_db_cd_fdin_eof_curs &curs, myns::FDb &parent) __attribute__((nothrow));
+// cursor points to valid item
+// func:myns.FDb.cd_fdin_eof_curs.ValidQ
+inline bool          _db_cd_fdin_eof_curs_ValidQ(_db_cd_fdin_eof_curs &curs) __attribute__((nothrow));
+// proceed to next item
+// func:myns.FDb.cd_fdin_eof_curs.Next
+inline void          _db_cd_fdin_eof_curs_Next(_db_cd_fdin_eof_curs &curs) __attribute__((nothrow));
+// item access
+// func:myns.FDb.cd_fdin_eof_curs.Access
+inline myns::Client& _db_cd_fdin_eof_curs_Access(_db_cd_fdin_eof_curs &curs) __attribute__((nothrow));
+// cursor points to valid item
+// func:myns.FDb.cd_fdin_read_curs.Reset
+inline void          _db_cd_fdin_read_curs_Reset(_db_cd_fdin_read_curs &curs, myns::FDb &parent) __attribute__((nothrow));
+// cursor points to valid item
+// func:myns.FDb.cd_fdin_read_curs.ValidQ
+inline bool          _db_cd_fdin_read_curs_ValidQ(_db_cd_fdin_read_curs &curs) __attribute__((nothrow));
+// proceed to next item
+// func:myns.FDb.cd_fdin_read_curs.Next
+inline void          _db_cd_fdin_read_curs_Next(_db_cd_fdin_read_curs &curs) __attribute__((nothrow));
+// item access
+// func:myns.FDb.cd_fdin_read_curs.Access
+inline myns::Client& _db_cd_fdin_read_curs_Access(_db_cd_fdin_read_curs &curs) __attribute__((nothrow));
+// cursor points to valid item
 // func:myns.FDb.part_curs.Reset
 inline void          _db_part_curs_Reset(_db_part_curs &curs, myns::FDb &parent) __attribute__((nothrow));
 // cursor points to valid item
@@ -682,67 +939,6 @@ inline void          FieldId_Init(myns::FieldId& parent);
 // cfmt:myns.FieldId.String  printfmt:Raw
 // func:myns.FieldId..Print
 void                 FieldId_Print(myns::FieldId& row, algo::cstring& str) __attribute__((nothrow));
-
-// --- myns.MsgHeader
-// access: myns.NewOrderReqMsg.base (Base)
-// access: myns.MsgHeader_curs.msg (Ptr)
-#pragma pack(push,1)
-struct MsgHeader { // myns.MsgHeader
-    u8   type;     //   0
-    u8   length;   //   0
-    // func:myns.MsgHeader..Ctor
-    inline               MsgHeader() __attribute__((nothrow));
-    // func:myns.MsgHeader..FieldwiseCtor
-    explicit inline               MsgHeader(u8 in_type, u8 in_length) __attribute__((nothrow));
-};
-#pragma pack(pop)
-
-// Get value of field as enum type
-// func:myns.MsgHeader.type.GetEnum
-inline myns_MsgHeader_type_Enum type_GetEnum(const myns::MsgHeader& parent) __attribute__((nothrow));
-// Set value of field from enum type.
-// func:myns.MsgHeader.type.SetEnum
-inline void          type_SetEnum(myns::MsgHeader& parent, myns_MsgHeader_type_Enum rhs) __attribute__((nothrow));
-// Convert numeric value of field to one of predefined string constants.
-// If string is found, return a static C string. Otherwise, return NULL.
-// func:myns.MsgHeader.type.ToCstr
-const char*          type_ToCstr(const myns::MsgHeader& parent) __attribute__((nothrow));
-// Convert type to a string. First, attempt conversion to a known string.
-// If no string matches, print type as a numeric value.
-// func:myns.MsgHeader.type.Print
-void                 type_Print(const myns::MsgHeader& parent, algo::cstring &lhs) __attribute__((nothrow));
-// Convert string to field.
-// If the string is invalid, do not modify field and return false.
-// In case of success, return true
-// func:myns.MsgHeader.type.SetStrptrMaybe
-bool                 type_SetStrptrMaybe(myns::MsgHeader& parent, algo::strptr rhs) __attribute__((nothrow));
-// Convert string to field.
-// If the string is invalid, set numeric value to DFLT
-// func:myns.MsgHeader.type.SetStrptr
-void                 type_SetStrptr(myns::MsgHeader& parent, algo::strptr rhs, myns_MsgHeader_type_Enum dflt) __attribute__((nothrow));
-// Convert string to field. Return success value
-// func:myns.MsgHeader.type.ReadStrptrMaybe
-bool                 type_ReadStrptrMaybe(myns::MsgHeader& parent, algo::strptr rhs) __attribute__((nothrow));
-
-// func:myns.MsgHeader..ReadFieldMaybe
-bool                 MsgHeader_ReadFieldMaybe(myns::MsgHeader& parent, algo::strptr field, algo::strptr strval) __attribute__((nothrow));
-// Read fields of myns::MsgHeader from an ascii string.
-// The format of the string is an ssim Tuple
-// func:myns.MsgHeader..ReadStrptrMaybe
-bool                 MsgHeader_ReadStrptrMaybe(myns::MsgHeader &parent, algo::strptr in_str) __attribute__((nothrow));
-// Message length (uses length field)
-// func:myns.MsgHeader..GetMsgLength
-inline i32           GetMsgLength(const myns::MsgHeader& parent) __attribute__((nothrow));
-// Memptr encompassing the message (uses length field)
-// func:myns.MsgHeader..GetMsgMemptr
-inline algo::memptr  GetMsgMemptr(const myns::MsgHeader& row) __attribute__((nothrow));
-// Set all fields to initial values.
-// func:myns.MsgHeader..Init
-inline void          MsgHeader_Init(myns::MsgHeader& parent);
-// print string representation of ROW to string STR
-// cfmt:myns.MsgHeader.String  printfmt:Tuple
-// func:myns.MsgHeader..Print
-void                 MsgHeader_Print(myns::MsgHeader& row, algo::cstring& str) __attribute__((nothrow));
 
 // --- myns.MsgHeaderMsgsCase
 #pragma pack(push,1)
@@ -955,6 +1151,28 @@ void                 TableId_Print(myns::TableId& row, algo::cstring& str) __att
 } // gen:ns_print_struct
 namespace myns { // gen:ns_curstext
 
+struct _db_cd_fdin_eof_curs {// fcurs:myns.FDb.cd_fdin_eof/curs
+    typedef myns::Client ChildType;
+    myns::Client* row;
+    myns::Client** head; // address of head element
+    _db_cd_fdin_eof_curs() {
+        row = NULL;
+        head = NULL;
+    }
+};
+
+
+struct _db_cd_fdin_read_curs {// fcurs:myns.FDb.cd_fdin_read/curs
+    typedef myns::Client ChildType;
+    myns::Client* row;
+    myns::Client** head; // address of head element
+    _db_cd_fdin_read_curs() {
+        row = NULL;
+        head = NULL;
+    }
+};
+
+
 struct _db_part_curs {// cursor
     typedef myns::FPart ChildType;
     myns::FDb *parent;
@@ -1013,9 +1231,9 @@ int WINAPI           WinMain(HINSTANCE,HINSTANCE,LPSTR,int);
 #endif
 // gen:ns_operators
 namespace algo {
+inline algo::cstring &operator <<(algo::cstring &str, const myns::MsgHeader &row);// cfmt:myns.MsgHeader.String
 inline algo::cstring &operator <<(algo::cstring &str, const myns::trace &row);// cfmt:myns.trace.String
 inline algo::cstring &operator <<(algo::cstring &str, const myns::FieldId &row);// cfmt:myns.FieldId.String
-inline algo::cstring &operator <<(algo::cstring &str, const myns::MsgHeader &row);// cfmt:myns.MsgHeader.String
 inline algo::cstring &operator <<(algo::cstring &str, const myns::NewOrderReqMsg &row);// cfmt:myns.NewOrderReqMsg.String
 inline algo::cstring &operator <<(algo::cstring &str, const myns::TableId &row);// cfmt:myns.TableId.String
 }

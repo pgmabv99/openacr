@@ -665,6 +665,8 @@ dmmeta.xref  field:lib_sql.FDb.ind_attr  inscond:true  via:""
 dmmeta.xref  field:lib_sqlite.FDb.ind_conn  inscond:true  via:""
 dmmeta.xref  field:mdbg.FDb.ind_cfg  inscond:true  via:""
 dmmeta.xref  field:mdbg.FCfg.c_builddir  inscond:true  via:mdbg.FDb.ind_cfg/dev.Builddir.cfg
+dmmeta.xref  field:myns.FDb.cd_fdin_eof  inscond:false  via:""
+dmmeta.xref  field:myns.FDb.cd_fdin_read  inscond:false  via:""
 dmmeta.xref  field:myns.FDb.ind_client  inscond:true  via:""
 dmmeta.xref  field:myns.FDb.zd_part  inscond:true  via:""
 dmmeta.xref  field:myns.FDb.ind_part  inscond:true  via:""
