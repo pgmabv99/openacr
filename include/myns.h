@@ -31,14 +31,5 @@ namespace myns { // update-hdr
     // -------------------------------------------------------------------
     // cpp/myns/myns.cpp
     //
-    void fill_orders();
-
-    // -------------------------------------------------------------------
-    // cpp/myns/util.cpp
-    //
-
-    // steps callbacks
-    //     (user-implemented function, prototype is in amc-generated header)
-    // void sched1_Step();
-    // void zd_order_Step();
+    void Main();
 }

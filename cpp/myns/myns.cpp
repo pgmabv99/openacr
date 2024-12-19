@@ -436,6 +436,31 @@ void myns::In_NewOrderReqMsg(myns::NewOrderReqMsg &msg)
     // auto retval = myns::add_order(algo::Smallstr50(part_key), amt);
 }
 
+void myns::cd_client_eof_Step() {
+    // client_RemoveAll();
+}
+
+// Read next input line from stdin
+void myns::cd_client_read_Step() {
+    myns::Client &client = *cd_client_read_RotateFirst();
+    algo::strptr msgstr = in_GetMsg(client);
+    if (msgstr.elems) {
+        algo::ByteAry buf;
+        if (In_ReadStrptrMaybe(msgstr,buf)) {
+            myns::MsgHeader *msg=(myns::MsgHeader*)buf.ary_elems;
+            tempstr out;
+            In_Print(out,*msg,msg->length);
+            prlog("input: "<<out);
+            myns::InDispatch(*msg);
+            prlog("");
+        } else if (Trimmed(msgstr)!="") {
+            prlog("bad input: "<<msgstr);
+        }
+        in_SkipMsg(client);
+    }
+}
+
+
 void myns::trm_listen()
 {
     _db.terminal.fildes = algo::Fildes(0);

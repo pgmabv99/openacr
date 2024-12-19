@@ -101,115 +101,115 @@ inline  myns::Client::~Client() {
 inline  myns::trace::trace() {
 }
 
-// --- myns.FDb.cd_fdin_eof.EmptyQ
+// --- myns.FDb.cd_client_eof.EmptyQ
 // Return true if index is empty
-inline bool myns::cd_fdin_eof_EmptyQ() {
-    return _db.cd_fdin_eof_head == NULL;
+inline bool myns::cd_client_eof_EmptyQ() {
+    return _db.cd_client_eof_head == NULL;
 }
 
-// --- myns.FDb.cd_fdin_eof.First
+// --- myns.FDb.cd_client_eof.First
 // If index empty, return NULL. Otherwise return pointer to first element in index
-inline myns::Client* myns::cd_fdin_eof_First() {
+inline myns::Client* myns::cd_client_eof_First() {
     myns::Client *row = NULL;
-    row = _db.cd_fdin_eof_head;
+    row = _db.cd_client_eof_head;
     return row;
 }
 
-// --- myns.FDb.cd_fdin_eof.InLlistQ
+// --- myns.FDb.cd_client_eof.InLlistQ
 // Return true if row is in the linked list, false otherwise
-inline bool myns::cd_fdin_eof_InLlistQ(myns::Client& row) {
+inline bool myns::cd_client_eof_InLlistQ(myns::Client& row) {
     bool result = false;
-    result = !(row.cd_fdin_eof_next == (myns::Client*)-1);
+    result = !(row.cd_client_eof_next == (myns::Client*)-1);
     return result;
 }
 
-// --- myns.FDb.cd_fdin_eof.Last
+// --- myns.FDb.cd_client_eof.Last
 // If index empty, return NULL. Otherwise return pointer to last element in index
-inline myns::Client* myns::cd_fdin_eof_Last() {
+inline myns::Client* myns::cd_client_eof_Last() {
     myns::Client *row = NULL;
-    row = _db.cd_fdin_eof_head ? _db.cd_fdin_eof_head->cd_fdin_eof_prev : NULL;
+    row = _db.cd_client_eof_head ? _db.cd_client_eof_head->cd_client_eof_prev : NULL;
     return row;
 }
 
-// --- myns.FDb.cd_fdin_eof.N
+// --- myns.FDb.cd_client_eof.N
 // Return number of items in the linked list
-inline i32 myns::cd_fdin_eof_N() {
-    return _db.cd_fdin_eof_n;
+inline i32 myns::cd_client_eof_N() {
+    return _db.cd_client_eof_n;
 }
 
-// --- myns.FDb.cd_fdin_eof.Next
+// --- myns.FDb.cd_client_eof.Next
 // Return pointer to next element in the list
-inline myns::Client* myns::cd_fdin_eof_Next(myns::Client &row) {
-    return row.cd_fdin_eof_next;
+inline myns::Client* myns::cd_client_eof_Next(myns::Client &row) {
+    return row.cd_client_eof_next;
 }
 
-// --- myns.FDb.cd_fdin_eof.Prev
+// --- myns.FDb.cd_client_eof.Prev
 // Return pointer to previous element in the list
-inline myns::Client* myns::cd_fdin_eof_Prev(myns::Client &row) {
-    return row.cd_fdin_eof_prev;
+inline myns::Client* myns::cd_client_eof_Prev(myns::Client &row) {
+    return row.cd_client_eof_prev;
 }
 
-// --- myns.FDb.cd_fdin_eof.qLast
+// --- myns.FDb.cd_client_eof.qLast
 // Return reference to last element in the index. No bounds checking.
-inline myns::Client& myns::cd_fdin_eof_qLast() {
+inline myns::Client& myns::cd_client_eof_qLast() {
     myns::Client *row = NULL;
-    row = _db.cd_fdin_eof_head ? _db.cd_fdin_eof_head->cd_fdin_eof_prev : NULL;
+    row = _db.cd_client_eof_head ? _db.cd_client_eof_head->cd_client_eof_prev : NULL;
     return *row;
 }
 
-// --- myns.FDb.cd_fdin_read.EmptyQ
+// --- myns.FDb.cd_client_read.EmptyQ
 // Return true if index is empty
-inline bool myns::cd_fdin_read_EmptyQ() {
-    return _db.cd_fdin_read_head == NULL;
+inline bool myns::cd_client_read_EmptyQ() {
+    return _db.cd_client_read_head == NULL;
 }
 
-// --- myns.FDb.cd_fdin_read.First
+// --- myns.FDb.cd_client_read.First
 // If index empty, return NULL. Otherwise return pointer to first element in index
-inline myns::Client* myns::cd_fdin_read_First() {
+inline myns::Client* myns::cd_client_read_First() {
     myns::Client *row = NULL;
-    row = _db.cd_fdin_read_head;
+    row = _db.cd_client_read_head;
     return row;
 }
 
-// --- myns.FDb.cd_fdin_read.InLlistQ
+// --- myns.FDb.cd_client_read.InLlistQ
 // Return true if row is in the linked list, false otherwise
-inline bool myns::cd_fdin_read_InLlistQ(myns::Client& row) {
+inline bool myns::cd_client_read_InLlistQ(myns::Client& row) {
     bool result = false;
-    result = !(row.cd_fdin_read_next == (myns::Client*)-1);
+    result = !(row.cd_client_read_next == (myns::Client*)-1);
     return result;
 }
 
-// --- myns.FDb.cd_fdin_read.Last
+// --- myns.FDb.cd_client_read.Last
 // If index empty, return NULL. Otherwise return pointer to last element in index
-inline myns::Client* myns::cd_fdin_read_Last() {
+inline myns::Client* myns::cd_client_read_Last() {
     myns::Client *row = NULL;
-    row = _db.cd_fdin_read_head ? _db.cd_fdin_read_head->cd_fdin_read_prev : NULL;
+    row = _db.cd_client_read_head ? _db.cd_client_read_head->cd_client_read_prev : NULL;
     return row;
 }
 
-// --- myns.FDb.cd_fdin_read.N
+// --- myns.FDb.cd_client_read.N
 // Return number of items in the linked list
-inline i32 myns::cd_fdin_read_N() {
-    return _db.cd_fdin_read_n;
+inline i32 myns::cd_client_read_N() {
+    return _db.cd_client_read_n;
 }
 
-// --- myns.FDb.cd_fdin_read.Next
+// --- myns.FDb.cd_client_read.Next
 // Return pointer to next element in the list
-inline myns::Client* myns::cd_fdin_read_Next(myns::Client &row) {
-    return row.cd_fdin_read_next;
+inline myns::Client* myns::cd_client_read_Next(myns::Client &row) {
+    return row.cd_client_read_next;
 }
 
-// --- myns.FDb.cd_fdin_read.Prev
+// --- myns.FDb.cd_client_read.Prev
 // Return pointer to previous element in the list
-inline myns::Client* myns::cd_fdin_read_Prev(myns::Client &row) {
-    return row.cd_fdin_read_prev;
+inline myns::Client* myns::cd_client_read_Prev(myns::Client &row) {
+    return row.cd_client_read_prev;
 }
 
-// --- myns.FDb.cd_fdin_read.qLast
+// --- myns.FDb.cd_client_read.qLast
 // Return reference to last element in the index. No bounds checking.
-inline myns::Client& myns::cd_fdin_read_qLast() {
+inline myns::Client& myns::cd_client_read_qLast() {
     myns::Client *row = NULL;
-    row = _db.cd_fdin_read_head ? _db.cd_fdin_read_head->cd_fdin_read_prev : NULL;
+    row = _db.cd_client_read_head ? _db.cd_client_read_head->cd_client_read_prev : NULL;
     return *row;
 }
 
@@ -403,61 +403,61 @@ inline myns::Order& myns::zd_order_qLast() {
     return *row;
 }
 
-// --- myns.FDb.cd_fdin_eof_curs.Reset
+// --- myns.FDb.cd_client_eof_curs.Reset
 // cursor points to valid item
-inline void myns::_db_cd_fdin_eof_curs_Reset(_db_cd_fdin_eof_curs &curs, myns::FDb &parent) {
-    curs.row = parent.cd_fdin_eof_head;
-    curs.head = &parent.cd_fdin_eof_head;
+inline void myns::_db_cd_client_eof_curs_Reset(_db_cd_client_eof_curs &curs, myns::FDb &parent) {
+    curs.row = parent.cd_client_eof_head;
+    curs.head = &parent.cd_client_eof_head;
 }
 
-// --- myns.FDb.cd_fdin_eof_curs.ValidQ
+// --- myns.FDb.cd_client_eof_curs.ValidQ
 // cursor points to valid item
-inline bool myns::_db_cd_fdin_eof_curs_ValidQ(_db_cd_fdin_eof_curs &curs) {
+inline bool myns::_db_cd_client_eof_curs_ValidQ(_db_cd_client_eof_curs &curs) {
     return curs.row != NULL;
 }
 
-// --- myns.FDb.cd_fdin_eof_curs.Next
+// --- myns.FDb.cd_client_eof_curs.Next
 // proceed to next item
-inline void myns::_db_cd_fdin_eof_curs_Next(_db_cd_fdin_eof_curs &curs) {
-    myns::Client *next = (*curs.row).cd_fdin_eof_next;
+inline void myns::_db_cd_client_eof_curs_Next(_db_cd_client_eof_curs &curs) {
+    myns::Client *next = (*curs.row).cd_client_eof_next;
     curs.row = next;
     if (curs.row == *curs.head) {
         curs.row = NULL;
     }
 }
 
-// --- myns.FDb.cd_fdin_eof_curs.Access
+// --- myns.FDb.cd_client_eof_curs.Access
 // item access
-inline myns::Client& myns::_db_cd_fdin_eof_curs_Access(_db_cd_fdin_eof_curs &curs) {
+inline myns::Client& myns::_db_cd_client_eof_curs_Access(_db_cd_client_eof_curs &curs) {
     return *curs.row;
 }
 
-// --- myns.FDb.cd_fdin_read_curs.Reset
+// --- myns.FDb.cd_client_read_curs.Reset
 // cursor points to valid item
-inline void myns::_db_cd_fdin_read_curs_Reset(_db_cd_fdin_read_curs &curs, myns::FDb &parent) {
-    curs.row = parent.cd_fdin_read_head;
-    curs.head = &parent.cd_fdin_read_head;
+inline void myns::_db_cd_client_read_curs_Reset(_db_cd_client_read_curs &curs, myns::FDb &parent) {
+    curs.row = parent.cd_client_read_head;
+    curs.head = &parent.cd_client_read_head;
 }
 
-// --- myns.FDb.cd_fdin_read_curs.ValidQ
+// --- myns.FDb.cd_client_read_curs.ValidQ
 // cursor points to valid item
-inline bool myns::_db_cd_fdin_read_curs_ValidQ(_db_cd_fdin_read_curs &curs) {
+inline bool myns::_db_cd_client_read_curs_ValidQ(_db_cd_client_read_curs &curs) {
     return curs.row != NULL;
 }
 
-// --- myns.FDb.cd_fdin_read_curs.Next
+// --- myns.FDb.cd_client_read_curs.Next
 // proceed to next item
-inline void myns::_db_cd_fdin_read_curs_Next(_db_cd_fdin_read_curs &curs) {
-    myns::Client *next = (*curs.row).cd_fdin_read_next;
+inline void myns::_db_cd_client_read_curs_Next(_db_cd_client_read_curs &curs) {
+    myns::Client *next = (*curs.row).cd_client_read_next;
     curs.row = next;
     if (curs.row == *curs.head) {
         curs.row = NULL;
     }
 }
 
-// --- myns.FDb.cd_fdin_read_curs.Access
+// --- myns.FDb.cd_client_read_curs.Access
 // item access
-inline myns::Client& myns::_db_cd_fdin_read_curs_Access(_db_cd_fdin_read_curs &curs) {
+inline myns::Client& myns::_db_cd_client_read_curs_Access(_db_cd_client_read_curs &curs) {
     return *curs.row;
 }
 
