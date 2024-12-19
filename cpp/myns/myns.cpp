@@ -341,23 +341,23 @@ void myns::tcp_accept()
     client_obj.client = port_char_array;
 
     // Make the new socket non-blocking and add it to epoll  via callback
-    client_obj.read.fildes = algo::Fildes(client_socket);
-    algo::SetBlockingMode(client_obj.read.fildes, false);
+    client_obj.iohook.fildes = algo::Fildes(client_socket);
+    algo::SetBlockingMode(client_obj.iohook.fildes, false);
 
-    callback_Set1(client_obj.read, client_obj, tcp_read);
+    callback_Set1(client_obj.iohook, client_obj, tcp_read);
 
     IOEvtFlags flags;
     read_Set(flags, true);
-    IohookAdd(client_obj.read, flags);
+    IohookAdd(client_obj.iohook, flags);
     client_obj.lastbuff = "empty";
 
     if (client_XrefMaybe(client_obj))
     {
-        prlog("client  object inserted in memory with xref. socket  " << client_obj.read.fildes.value);
+        prlog("client  object inserted in memory with xref. socket  " << client_obj.iohook.fildes.value);
     }
     else
     {
-        prlog("xref: fail to insert.. exit  " << client_obj.read.fildes.value);
+        prlog("xref: fail to insert.. exit  " << client_obj.iohook.fildes.value);
         tcp_close(client_obj);
         exit(EXIT_FAILURE);
     };
@@ -366,25 +366,25 @@ void myns::tcp_accept()
 // called on events on client socket like err/eof
 void myns::tcp_close(myns::Client &client_obj)
 {
-    close(client_obj.read.fildes.value);
-    IohookRemove(client_obj.read);
+    close(client_obj.iohook.fildes.value);
+    IohookRemove(client_obj.iohook);
     client_Delete(client_obj);
 };
 
 // called on events on client socket like read/write
 void myns::tcp_read(myns::Client &client_obj)
 {
-    prlog("==tcp_read fd " << client_obj.read.fildes.value);
+    prlog("==tcp_read fd " << client_obj.iohook.fildes.value);
     char buffer[BUFFER_SIZE];
     ssize_t buffer_len;
     char response[BUFFER_SIZE];
     ssize_t response_len;
 
-    buffer_len = read(client_obj.read.fildes.value, buffer, sizeof(buffer) - 1);
+    buffer_len = read(client_obj.iohook.fildes.value, buffer, sizeof(buffer) - 1);
     if (buffer_len > 0)
     {
         buffer[buffer_len] = '\0'; // Null-terminate the buffer
-        prlog("Received from client fd " << client_obj.read.fildes.value << " buffer " << buffer);
+        prlog("Received from client fd " << client_obj.iohook.fildes.value << " buffer " << buffer);
 
         // Parse buffer into 6-byte char array and integer using sscanf
         char part_key[7] = ""; // 6 bytes for the string part + 1 for the null terminator
@@ -406,20 +406,20 @@ void myns::tcp_read(myns::Client &client_obj)
         {
             response_len = sprintf(response, "Failed to add order for part %s with quantity %d \n", part_key, amt);
         }
-        if (write(client_obj.read.fildes.value, response, response_len) == -1)
+        if (write(client_obj.iohook.fildes.value, response, response_len) == -1)
         {
-            prlog("write error" << client_obj.read.fildes.value);
+            prlog("write error" << client_obj.iohook.fildes.value);
             tcp_close(client_obj);
         }
     }
     if (buffer_len == -1 && errno != EAGAIN)
     {
-        prlog("read error" << client_obj.read.fildes.value);
+        prlog("read error" << client_obj.iohook.fildes.value);
         tcp_close(client_obj);
     }
     else if (buffer_len == 0)
     {
-        prlog("Client  disconnected " << client_obj.read.fildes.value);
+        prlog("Client  disconnected " << client_obj.iohook.fildes.value);
         tcp_close(client_obj);
     }
 

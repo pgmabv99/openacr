@@ -110,110 +110,6 @@ namespace myns { // gen:ns_print_proto
     inline static void   SizeCheck();
 } // gen:ns_print_proto
 
-// --- myns.MsgHeader.type.ToCstr
-// Convert numeric value of field to one of predefined string constants.
-// If string is found, return a static C string. Otherwise, return NULL.
-const char* myns::type_ToCstr(const myns::MsgHeader& in) {
-    const char *ret = NULL;
-    switch(type_GetEnum(in)) {
-        case myns_MsgHeader_type_myns_NewOrderReqMsg: ret = "myns.NewOrderReqMsg";  break;
-    }
-    return ret;
-}
-
-// --- myns.MsgHeader.type.Print
-// Convert type to a string. First, attempt conversion to a known string.
-// If no string matches, print type as a numeric value.
-void myns::type_Print(const myns::MsgHeader& in, algo::cstring &lhs) {
-    const char *strval = type_ToCstr(in);
-    if (strval) {
-        lhs << strval;
-    } else {
-        lhs << in.type;
-    }
-}
-
-// --- myns.MsgHeader.type.SetStrptrMaybe
-// Convert string to field.
-// If the string is invalid, do not modify field and return false.
-// In case of success, return true
-bool myns::type_SetStrptrMaybe(myns::MsgHeader& in, algo::strptr rhs) {
-    bool ret = false;
-    switch (elems_N(rhs)) {
-        case 19: {
-            switch (algo::ReadLE64(rhs.elems)) {
-                case LE_STR8('m','y','n','s','.','N','e','w'): {
-                    if (memcmp(rhs.elems+8,"OrderReqMsg",11)==0) { type_SetEnum(in,myns_MsgHeader_type_myns_NewOrderReqMsg); ret = true; break; }
-                    break;
-                }
-            }
-            break;
-        }
-    }
-    return ret;
-}
-
-// --- myns.MsgHeader.type.SetStrptr
-// Convert string to field.
-// If the string is invalid, set numeric value to DFLT
-void myns::type_SetStrptr(myns::MsgHeader& in, algo::strptr rhs, myns_MsgHeader_type_Enum dflt) {
-    if (!type_SetStrptrMaybe(in,rhs)) type_SetEnum(in,dflt);
-}
-
-// --- myns.MsgHeader.type.ReadStrptrMaybe
-// Convert string to field. Return success value
-bool myns::type_ReadStrptrMaybe(myns::MsgHeader& in, algo::strptr rhs) {
-    bool retval = false;
-    retval = type_SetStrptrMaybe(in,rhs); // try symbol conversion
-    if (!retval) { // didn't work? try reading as underlying type
-        retval = u8_ReadStrptrMaybe(in.type,rhs);
-    }
-    return retval;
-}
-
-// --- myns.MsgHeader..ReadFieldMaybe
-bool myns::MsgHeader_ReadFieldMaybe(myns::MsgHeader& parent, algo::strptr field, algo::strptr strval) {
-    bool retval = true;
-    myns::FieldId field_id;
-    (void)value_SetStrptrMaybe(field_id,field);
-    switch(field_id) {
-        case myns_FieldId_type: {
-            retval = type_ReadStrptrMaybe(parent, strval);
-            break;
-        }
-        case myns_FieldId_length: {
-            retval = false;
-            break;
-        }
-        default: break;
-    }
-    if (!retval) {
-        algo_lib::AppendErrtext("attr",field);
-    }
-    return retval;
-}
-
-// --- myns.MsgHeader..ReadStrptrMaybe
-// Read fields of myns::MsgHeader from an ascii string.
-// The format of the string is an ssim Tuple
-bool myns::MsgHeader_ReadStrptrMaybe(myns::MsgHeader &parent, algo::strptr in_str) {
-    bool retval = true;
-    retval = algo::StripTypeTag(in_str, "myns.MsgHeader");
-    ind_beg(algo::Attr_curs, attr, in_str) {
-        retval = retval && MsgHeader_ReadFieldMaybe(parent, attr.name, attr.value);
-    }ind_end;
-    return retval;
-}
-
-// --- myns.MsgHeader..Print
-// print string representation of ROW to string STR
-// cfmt:myns.MsgHeader.String  printfmt:Tuple
-void myns::MsgHeader_Print(myns::MsgHeader& row, algo::cstring& str) {
-    algo::tempstr temp;
-    str << "myns.MsgHeader";
-    (void)row;//only to avoid -Wunused-parameter
-}
-
 // --- myns.Client.in.BeginRead
 // Attach fbuf to Iohook for reading
 // Attach file descriptor and begin reading using edge-triggered epoll.
@@ -245,10 +141,16 @@ void myns::in_EndRead(myns::Client& client) {
 // Look for valid message at current position in the buffer.
 // If message is already there, return a pointer to it. Do not skip message (call SkipMsg to do that).
 // If there is no message, read once from underlying file descriptor and try again.
-// The message is length-delimited based on field length field
+// The message is found by looking for delimiter '
+// '.
+// The return value is an aryptr. If ret.elems is non-NULL, the message is valid (possibly empty).
+// If ret.elems is NULL, no message can be extracted from buffer.
+// The returned aryptr excludes the trailing deliminter.
+// SkipMsg will skip both the line and the deliminter.
+// A partial line at the end of input is NOT returned (TODO?)
 // 
-myns::MsgHeader* myns::in_GetMsg(myns::Client& client) {
-    myns::MsgHeader* ret;
+algo::aryptr<char> myns::in_GetMsg(myns::Client& client) {
+    algo::aryptr<char> ret;
     if (!client.in_msgvalid) {
         in_ScanMsg(client);
         if (!client.in_msgvalid) {
@@ -258,8 +160,11 @@ myns::MsgHeader* myns::in_GetMsg(myns::Client& client) {
             }
         }
     }
-    myns::MsgHeader *hdr = (myns::MsgHeader*)(client.in_elems + client.in_start);
-    ret = client.in_msgvalid ? hdr : NULL;
+    char *hdr = (char*)(client.in_elems + client.in_start);
+    if (client.in_msgvalid) {
+        ret.elems = hdr;
+        ret.n_elems = client.in_msglen;
+    }
     if (!client.in_msgvalid && client.in_eof) { // all messages processed
         myns::cd_client_eof_Insert(client);
     }
@@ -310,16 +215,22 @@ void myns::in_RemoveAll(myns::Client& client) {
 // Internal function to scan for a message
 // 
 static void myns::in_ScanMsg(myns::Client& client) {
-    myns::MsgHeader *hdr = (myns::MsgHeader*)(client.in_elems + client.in_start);
+    char *hdr = (char*)(client.in_elems + client.in_start);
     i32 avail = in_N(client);
     i32 msglen;
     bool found = false;
-    msglen = ssizeof(myns::MsgHeader);
-    if (avail >= msglen) {
-        msglen = i32((*hdr).length); // check rest of the message
+    // scan for delimiter starting from the previous place where we left off.
+    // at the end, save offset back to client so we don't have to re-scan.
+    // returned message length **does not include delimiter**.
+    // a line that exceeds buffer length is not returned.
+    for (msglen = client.in_msglen; msglen < avail; msglen += sizeof(char)) {
+        if (hdr[msglen] == '
+        ') { // delimiter?
+            found = true;
+            break;
+        }
     }
-    found = msglen >= ssizeof(myns::MsgHeader) && avail >= msglen;
-    if (msglen < ssizeof(myns::MsgHeader) || msglen > in_Max(client)) {
+    if (!found && msglen >= in_Max(client)) {
         client.in_eof = true; // cause user to detect eof
         client.in_err = algo::FromErrno(E2BIG); // argument list too big -- closest error code
     }
@@ -340,12 +251,24 @@ static void myns::in_Shift(myns::Client& client) {
     client.in_start = 0;
 }
 
+// --- myns.Client.in.SkipBytes
+// Skip N bytes when reading
+// Mark some buffer contents as read.
+// 
+void myns::in_SkipBytes(myns::Client& client, int n) {
+    int avail = client.in_end - client.in_start;
+    n = i32_Min(n,avail);
+    client.in_start += n;
+    client.in_msgvalid = false;
+}
+
 // --- myns.Client.in.SkipMsg
 // Skip current message, if any
 // Skip current message, if any.
 void myns::in_SkipMsg(myns::Client& client) {
     if (client.in_msgvalid) {
         int skip = client.in_msglen;
+        skip += ssizeof(char); // delimiter
         i32 start = client.in_start;
         start += skip;
         client.in_start = start;
@@ -374,15 +297,6 @@ bool myns::in_WriteAll(myns::Client& client, u8 *in, i32 in_n) {
         client.in_end = end + in_n;
     }
     return fits;
-}
-
-// --- myns.Client.in.XrefMaybe
-// Insert row into all appropriate indices. If error occurs, store error
-// in algo_lib::_db.errtext and return false. Caller must Delete or Unref such row.
-bool myns::in_XrefMaybe(myns::MsgHeader &row) {
-    bool retval = true;
-    (void)row;
-    return retval;
 }
 
 // --- myns.Client..Init
@@ -2226,6 +2140,110 @@ bool myns::InCase_ReadStrptrMaybe(myns::InCase &parent, algo::strptr in_str) {
     return retval;
 }
 
+// --- myns.MsgHeader.type.ToCstr
+// Convert numeric value of field to one of predefined string constants.
+// If string is found, return a static C string. Otherwise, return NULL.
+const char* myns::type_ToCstr(const myns::MsgHeader& parent) {
+    const char *ret = NULL;
+    switch(type_GetEnum(parent)) {
+        case myns_MsgHeader_type_myns_NewOrderReqMsg: ret = "myns.NewOrderReqMsg";  break;
+    }
+    return ret;
+}
+
+// --- myns.MsgHeader.type.Print
+// Convert type to a string. First, attempt conversion to a known string.
+// If no string matches, print type as a numeric value.
+void myns::type_Print(const myns::MsgHeader& parent, algo::cstring &lhs) {
+    const char *strval = type_ToCstr(parent);
+    if (strval) {
+        lhs << strval;
+    } else {
+        lhs << parent.type;
+    }
+}
+
+// --- myns.MsgHeader.type.SetStrptrMaybe
+// Convert string to field.
+// If the string is invalid, do not modify field and return false.
+// In case of success, return true
+bool myns::type_SetStrptrMaybe(myns::MsgHeader& parent, algo::strptr rhs) {
+    bool ret = false;
+    switch (elems_N(rhs)) {
+        case 19: {
+            switch (algo::ReadLE64(rhs.elems)) {
+                case LE_STR8('m','y','n','s','.','N','e','w'): {
+                    if (memcmp(rhs.elems+8,"OrderReqMsg",11)==0) { type_SetEnum(parent,myns_MsgHeader_type_myns_NewOrderReqMsg); ret = true; break; }
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    return ret;
+}
+
+// --- myns.MsgHeader.type.SetStrptr
+// Convert string to field.
+// If the string is invalid, set numeric value to DFLT
+void myns::type_SetStrptr(myns::MsgHeader& parent, algo::strptr rhs, myns_MsgHeader_type_Enum dflt) {
+    if (!type_SetStrptrMaybe(parent,rhs)) type_SetEnum(parent,dflt);
+}
+
+// --- myns.MsgHeader.type.ReadStrptrMaybe
+// Convert string to field. Return success value
+bool myns::type_ReadStrptrMaybe(myns::MsgHeader& parent, algo::strptr rhs) {
+    bool retval = false;
+    retval = type_SetStrptrMaybe(parent,rhs); // try symbol conversion
+    if (!retval) { // didn't work? try reading as underlying type
+        retval = u8_ReadStrptrMaybe(parent.type,rhs);
+    }
+    return retval;
+}
+
+// --- myns.MsgHeader..ReadFieldMaybe
+bool myns::MsgHeader_ReadFieldMaybe(myns::MsgHeader& parent, algo::strptr field, algo::strptr strval) {
+    bool retval = true;
+    myns::FieldId field_id;
+    (void)value_SetStrptrMaybe(field_id,field);
+    switch(field_id) {
+        case myns_FieldId_type: {
+            retval = type_ReadStrptrMaybe(parent, strval);
+            break;
+        }
+        case myns_FieldId_length: {
+            retval = false;
+            break;
+        }
+        default: break;
+    }
+    if (!retval) {
+        algo_lib::AppendErrtext("attr",field);
+    }
+    return retval;
+}
+
+// --- myns.MsgHeader..ReadStrptrMaybe
+// Read fields of myns::MsgHeader from an ascii string.
+// The format of the string is an ssim Tuple
+bool myns::MsgHeader_ReadStrptrMaybe(myns::MsgHeader &parent, algo::strptr in_str) {
+    bool retval = true;
+    retval = algo::StripTypeTag(in_str, "myns.MsgHeader");
+    ind_beg(algo::Attr_curs, attr, in_str) {
+        retval = retval && MsgHeader_ReadFieldMaybe(parent, attr.name, attr.value);
+    }ind_end;
+    return retval;
+}
+
+// --- myns.MsgHeader..Print
+// print string representation of ROW to string STR
+// cfmt:myns.MsgHeader.String  printfmt:Tuple
+void myns::MsgHeader_Print(myns::MsgHeader& row, algo::cstring& str) {
+    algo::tempstr temp;
+    str << "myns.MsgHeader";
+    (void)row;//only to avoid -Wunused-parameter
+}
+
 // --- myns.MsgHeaderMsgsCase.value.ToCstr
 // Convert numeric value of field to one of predefined string constants.
 // If string is found, return a static C string. Otherwise, return NULL.
@@ -2465,6 +2483,7 @@ inline static void myns::SizeCheck() {
 void myns::StaticCheck() {
     algo_assert(_offset_of(myns::FieldId, value) + sizeof(((myns::FieldId*)0)->value) == sizeof(myns::FieldId));
     algo_assert(_offset_of(myns::InCase, value) + sizeof(((myns::InCase*)0)->value) == sizeof(myns::InCase));
+    algo_assert(_offset_of(myns::MsgHeader, length) + sizeof(((myns::MsgHeader*)0)->length) == sizeof(myns::MsgHeader));
     algo_assert(_offset_of(myns::MsgHeaderMsgsCase, value) + sizeof(((myns::MsgHeaderMsgsCase*)0)->value) == sizeof(myns::MsgHeaderMsgsCase));
     algo_assert(_offset_of(myns::MsgHeader_curs, msglen) + sizeof(((myns::MsgHeader_curs*)0)->msglen) == sizeof(myns::MsgHeader_curs));
     algo_assert(_offset_of(myns::NewOrderReqMsg, amt) + sizeof(((myns::NewOrderReqMsg*)0)->amt) == sizeof(myns::NewOrderReqMsg));

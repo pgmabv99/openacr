@@ -29,49 +29,6 @@
 #include "include/gen/mynsdb_gen.inl.h"
 //#pragma endinclude
 
-// --- myns.MsgHeader.type.GetEnum
-// Get value of field as enum type
-inline myns_MsgHeader_type_Enum myns::type_GetEnum(const myns::MsgHeader& in) {
-    return myns_MsgHeader_type_Enum(in.type);
-}
-
-// --- myns.MsgHeader.type.SetEnum
-// Set value of field from enum type.
-inline void myns::type_SetEnum(myns::MsgHeader& in, myns_MsgHeader_type_Enum rhs) {
-    in.type = u8(rhs);
-}
-
-// --- myns.MsgHeader..GetMsgLength
-// Message length (uses length field)
-inline i32 myns::GetMsgLength(const myns::MsgHeader& parent) {
-    return i32(const_cast<myns::MsgHeader&>(parent).length);
-}
-
-// --- myns.MsgHeader..GetMsgMemptr
-// Memptr encompassing the message (uses length field)
-inline algo::memptr myns::GetMsgMemptr(const myns::MsgHeader& row) {
-    return algo::memptr((u8*)&row, i32(const_cast<myns::MsgHeader&>(row).length));
-}
-
-// --- myns.MsgHeader..Init
-// Set all fields to initial values.
-inline void myns::MsgHeader_Init(myns::MsgHeader& in) {
-    in.type = u8(0);
-    in.length = u8(0);
-}
-
-// --- myns.MsgHeader..Ctor
-inline  myns::MsgHeader::MsgHeader() {
-    myns::MsgHeader_Init(*this);
-}
-
-// --- myns.MsgHeader..FieldwiseCtor
-inline  myns::MsgHeader::MsgHeader(u8 in_type, u8 in_length)
-    : type(in_type)
-    , length(in_length)
- {
-}
-
 // --- myns.Client.in.Max
 // Return max. number of bytes in the buffer.
 inline i32 myns::in_Max(myns::Client& client) {
@@ -718,6 +675,49 @@ inline  myns::InCase::InCase(myns_InCaseEnum arg) {
     this->value = u32(arg);
 }
 
+// --- myns.MsgHeader.type.GetEnum
+// Get value of field as enum type
+inline myns_MsgHeader_type_Enum myns::type_GetEnum(const myns::MsgHeader& parent) {
+    return myns_MsgHeader_type_Enum(parent.type);
+}
+
+// --- myns.MsgHeader.type.SetEnum
+// Set value of field from enum type.
+inline void myns::type_SetEnum(myns::MsgHeader& parent, myns_MsgHeader_type_Enum rhs) {
+    parent.type = u8(rhs);
+}
+
+// --- myns.MsgHeader..GetMsgLength
+// Message length (uses length field)
+inline i32 myns::GetMsgLength(const myns::MsgHeader& parent) {
+    return i32(const_cast<myns::MsgHeader&>(parent).length);
+}
+
+// --- myns.MsgHeader..GetMsgMemptr
+// Memptr encompassing the message (uses length field)
+inline algo::memptr myns::GetMsgMemptr(const myns::MsgHeader& row) {
+    return algo::memptr((u8*)&row, i32(const_cast<myns::MsgHeader&>(row).length));
+}
+
+// --- myns.MsgHeader..Init
+// Set all fields to initial values.
+inline void myns::MsgHeader_Init(myns::MsgHeader& parent) {
+    parent.type = u8(0);
+    parent.length = u8(0);
+}
+
+// --- myns.MsgHeader..Ctor
+inline  myns::MsgHeader::MsgHeader() {
+    myns::MsgHeader_Init(*this);
+}
+
+// --- myns.MsgHeader..FieldwiseCtor
+inline  myns::MsgHeader::MsgHeader(u8 in_type, u8 in_length)
+    : type(in_type)
+    , length(in_length)
+ {
+}
+
 // --- myns.MsgHeaderMsgsCase.value.GetEnum
 // Get value of field as enum type
 inline myns_MsgHeaderMsgsCaseEnum myns::value_GetEnum(const myns::MsgHeaderMsgsCase& parent) {
@@ -928,11 +928,6 @@ inline  myns::TableId::TableId(myns_TableIdEnum arg) {
     this->value = i32(arg);
 }
 
-inline algo::cstring &algo::operator <<(algo::cstring &str, const myns::MsgHeader &row) {// cfmt:myns.MsgHeader.String
-    myns::MsgHeader_Print(const_cast<myns::MsgHeader&>(row), str);
-    return str;
-}
-
 inline algo::cstring &algo::operator <<(algo::cstring &str, const myns::trace &row) {// cfmt:myns.trace.String
     myns::trace_Print(const_cast<myns::trace&>(row), str);
     return str;
@@ -940,6 +935,11 @@ inline algo::cstring &algo::operator <<(algo::cstring &str, const myns::trace &r
 
 inline algo::cstring &algo::operator <<(algo::cstring &str, const myns::FieldId &row) {// cfmt:myns.FieldId.String
     myns::FieldId_Print(const_cast<myns::FieldId&>(row), str);
+    return str;
+}
+
+inline algo::cstring &algo::operator <<(algo::cstring &str, const myns::MsgHeader &row) {// cfmt:myns.MsgHeader.String
+    myns::MsgHeader_Print(const_cast<myns::MsgHeader&>(row), str);
     return str;
 }
 
