@@ -22,7 +22,9 @@
          ],
          "miDebuggerPath": "/usr/bin/gdb",  // Path to gdb, modify if necessary
          "preLaunchTask": "ai_task",  //  run ai
-         "internalConsoleOptions": "openOnSessionStart"
+         // "internalConsoleOptions": "openOnSessionStart"
+         "internalConsoleOptions": "neverOpen"  // This prevents the Debug Console from opening automatically
+    }
       },
       {
          "name": "g++ build and debug active file",
