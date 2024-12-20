@@ -451,6 +451,7 @@ void myns::In_NewOrderReqMsg(myns::NewOrderReqMsg &msg)
 }
 
 void myns::cd_client_eof_Step() {
+    prlog("==cd_client_eof_Step");
     // client_RemoveAll();
 }
 
