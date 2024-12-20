@@ -76,6 +76,11 @@ namespace myns
 
 }
 
+namespace myns {
+    extern int step_invocation_count;
+    extern int version;
+    extern bool step_display_flag;
+}
 // todo , make this into namespace
 extern int step_invocation_count;
 extern std::vector<myns::part_data_t> part_data;

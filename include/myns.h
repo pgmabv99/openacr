@@ -31,5 +31,16 @@ namespace myns { // update-hdr
     // -------------------------------------------------------------------
     // cpp/myns/myns.cpp
     //
-    void Main();
+    void fill_orders();
+    //     (user-implemented function, prototype is in amc-generated header)
+    // void cd_client_eof_Step();
+
+    // callback to Read next input line from stdin
+    // void cd_client_read_Step();
+
+    // -------------------------------------------------------------------
+    // cpp/myns/util.cpp
+    //
+    //     (user-implemented function, prototype is in amc-generated header)
+    // void zd_order_Step();
 }

@@ -21,13 +21,21 @@
 #include "cpp/myns/util.h"
 
 // steps callbacks
-void myns::sched1_Step() {
-    step_invocation_count++;
-    prlog("Enter  " << __func__ << " at " << algo::CurrUnTime()<< "step invocation count " << step_invocation_count);
-    scan_zd_db_order_via_sched1_fstep();
+void myns::sched1_Step()
+{
+    if (step_display_flag)
+    {
+
+        step_invocation_count++;
+        prlog("Enter  " << __func__ << " at " << algo::CurrUnTime() << "step invocation count " << step_invocation_count);
+        scan_zd_db_order_via_sched1_fstep();
+    }
 }
 
 void myns::zd_order_Step() {
-    prlog("Enter  " << __func__ << " at " << algo::CurrUnTime() );
-    scan_zd_db_order_via_own_fstep();
+    if (step_display_flag)
+    {
+        prlog("Enter  " << __func__ << " at " << algo::CurrUnTime() );
+        scan_zd_db_order_via_own_fstep();
+    }
 }

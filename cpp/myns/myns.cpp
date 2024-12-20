@@ -23,7 +23,12 @@
 
 // define
 // todo : try to move the vars to namespace
-int step_invocation_count=0;
+
+
+int myns::step_invocation_count = 0;
+// int myns::version = 0;
+int myns::version = 1;
+bool myns::step_display_flag = false;
 std::vector<myns::part_data_t> part_data(N_PART);
 
 void myns::scan_db_part_order()
@@ -344,11 +349,20 @@ void myns::tcp_accept()
     client_obj.iohook.fildes = algo::Fildes(client_socket);
     algo::SetBlockingMode(client_obj.iohook.fildes, false);
 
-    callback_Set1(client_obj.iohook, client_obj, tcp_read);
+    if (version == 0)
+    {
+        // use programmatic callback
+        callback_Set1(client_obj.iohook, client_obj, tcp_read);
+        IOEvtFlags flags;
+        read_Set(flags, true);
+        IohookAdd(client_obj.iohook, flags);
+    }
+    else
+    {
+        // use generated callback
+        in_BeginRead(client_obj,client_obj.iohook.fildes);
+    }
 
-    IOEvtFlags flags;
-    read_Set(flags, true);
-    IohookAdd(client_obj.iohook, flags);
     client_obj.lastbuff = "empty";
 
     if (client_XrefMaybe(client_obj))
@@ -424,7 +438,7 @@ void myns::tcp_read(myns::Client &client_obj)
     }
 
 }
-
+// callback to process incoming messages
 void myns::In_NewOrderReqMsg(myns::NewOrderReqMsg &msg)
 {
     algo::Smallstr50 part_key;
@@ -433,14 +447,14 @@ void myns::In_NewOrderReqMsg(myns::NewOrderReqMsg &msg)
     prlog("part_key: " << part_key << ", amt: " << amt);
 
     // add the order
-    // auto retval = myns::add_order(algo::Smallstr50(part_key), amt);
+    myns::add_order(algo::Smallstr50(part_key), amt);
 }
 
 void myns::cd_client_eof_Step() {
     // client_RemoveAll();
 }
 
-// Read next input line from stdin
+// callback to Read next input line from stdin
 void myns::cd_client_read_Step() {
     myns::Client &client = *cd_client_read_RotateFirst();
     algo::strptr msgstr = in_GetMsg(client);
@@ -520,6 +534,10 @@ void myns::cmd_execute(char cmd[CMD_SIZE])
     {
         fill_orders();
     }
+    else if (strcmp(cmd, "flip") == 0)
+    {
+        step_display_flag = !step_display_flag;
+    }
     else
     {
         prlog("unknown command");
@@ -532,8 +550,8 @@ void myns::Main()
     prlog("tests");
     step_invocation_count=0;
 
-    add_part();
-    add_orders_manually();
+    // add_part();
+    // add_orders_manually();
 
     // scan_db_part_order();
 
@@ -552,13 +570,17 @@ void myns::Main()
     trm_listen();
 
     myns::MainLoop();
-    terminate_mcb();
+    myns::terminate_mcb();
 }
-// void myns::Mcb::terminate_mcb(Mcb *mcb)
-void myns::terminate_mcb()
 
+void myns::terminate_mcb()
 {
+    prlog("==terminate_mcb");
+    IohookRemove(_db.listen);
+    IohookRemove(_db.terminal);
+    // client_RemoveAll();
+    part_RemoveAll();
     prlog("==done 37");
-    // delete mcb;
     exit(EXIT_SUCCESS);
+    //
 }

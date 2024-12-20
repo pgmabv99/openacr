@@ -224,8 +224,7 @@ static void myns::in_ScanMsg(myns::Client& client) {
     // returned message length **does not include delimiter**.
     // a line that exceeds buffer length is not returned.
     for (msglen = client.in_msglen; msglen < avail; msglen += sizeof(char)) {
-        if (hdr[msglen] == '
-        ') { // delimiter?
+        if ( hdr[msglen] == '\n') { // delimiter?
             found = true;
             break;
         }
