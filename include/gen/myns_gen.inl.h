@@ -58,6 +58,62 @@ inline  myns::Client::~Client() {
 inline  myns::trace::trace() {
 }
 
+// --- myns.FDb.zd_client_dbg.EmptyQ
+// Return true if index is empty
+inline bool myns::zd_client_dbg_EmptyQ() {
+    return _db.zd_client_dbg_head == NULL;
+}
+
+// --- myns.FDb.zd_client_dbg.First
+// If index empty, return NULL. Otherwise return pointer to first element in index
+inline myns::Client* myns::zd_client_dbg_First() {
+    myns::Client *row = NULL;
+    row = _db.zd_client_dbg_head;
+    return row;
+}
+
+// --- myns.FDb.zd_client_dbg.InLlistQ
+// Return true if row is in the linked list, false otherwise
+inline bool myns::zd_client_dbg_InLlistQ(myns::Client& row) {
+    bool result = false;
+    result = !(row.zd_client_dbg_next == (myns::Client*)-1);
+    return result;
+}
+
+// --- myns.FDb.zd_client_dbg.Last
+// If index empty, return NULL. Otherwise return pointer to last element in index
+inline myns::Client* myns::zd_client_dbg_Last() {
+    myns::Client *row = NULL;
+    row = _db.zd_client_dbg_tail;
+    return row;
+}
+
+// --- myns.FDb.zd_client_dbg.N
+// Return number of items in the linked list
+inline i32 myns::zd_client_dbg_N() {
+    return _db.zd_client_dbg_n;
+}
+
+// --- myns.FDb.zd_client_dbg.Next
+// Return pointer to next element in the list
+inline myns::Client* myns::zd_client_dbg_Next(myns::Client &row) {
+    return row.zd_client_dbg_next;
+}
+
+// --- myns.FDb.zd_client_dbg.Prev
+// Return pointer to previous element in the list
+inline myns::Client* myns::zd_client_dbg_Prev(myns::Client &row) {
+    return row.zd_client_dbg_prev;
+}
+
+// --- myns.FDb.zd_client_dbg.qLast
+// Return reference to last element in the index. No bounds checking.
+inline myns::Client& myns::zd_client_dbg_qLast() {
+    myns::Client *row = NULL;
+    row = _db.zd_client_dbg_tail;
+    return *row;
+}
+
 // --- myns.FDb.cd_client_eof.EmptyQ
 // Return true if index is empty
 inline bool myns::cd_client_eof_EmptyQ() {
@@ -168,18 +224,6 @@ inline myns::Client& myns::cd_client_read_qLast() {
     myns::Client *row = NULL;
     row = _db.cd_client_read_head ? _db.cd_client_read_head->cd_client_read_prev : NULL;
     return *row;
-}
-
-// --- myns.FDb.ind_client.EmptyQ
-// Return true if hash is empty
-inline bool myns::ind_client_EmptyQ() {
-    return _db.ind_client_n == 0;
-}
-
-// --- myns.FDb.ind_client.N
-// Return number of items in the hash
-inline i32 myns::ind_client_N() {
-    return _db.ind_client_n;
 }
 
 // --- myns.FDb.part.EmptyQ
@@ -358,6 +402,31 @@ inline myns::Order& myns::zd_order_qLast() {
     myns::Order *row = NULL;
     row = _db.zd_order_tail;
     return *row;
+}
+
+// --- myns.FDb.zd_client_dbg_curs.Reset
+// cursor points to valid item
+inline void myns::_db_zd_client_dbg_curs_Reset(_db_zd_client_dbg_curs &curs, myns::FDb &parent) {
+    curs.row = parent.zd_client_dbg_head;
+}
+
+// --- myns.FDb.zd_client_dbg_curs.ValidQ
+// cursor points to valid item
+inline bool myns::_db_zd_client_dbg_curs_ValidQ(_db_zd_client_dbg_curs &curs) {
+    return curs.row != NULL;
+}
+
+// --- myns.FDb.zd_client_dbg_curs.Next
+// proceed to next item
+inline void myns::_db_zd_client_dbg_curs_Next(_db_zd_client_dbg_curs &curs) {
+    myns::Client *next = (*curs.row).zd_client_dbg_next;
+    curs.row = next;
+}
+
+// --- myns.FDb.zd_client_dbg_curs.Access
+// item access
+inline myns::Client& myns::_db_zd_client_dbg_curs_Access(_db_zd_client_dbg_curs &curs) {
+    return *curs.row;
 }
 
 // --- myns.FDb.cd_client_eof_curs.Reset

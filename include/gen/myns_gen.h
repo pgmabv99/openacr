@@ -90,6 +90,7 @@ namespace mynsdb { struct Part; }
 namespace myns { struct MsgHeader; }
 namespace myns { struct FPart; }
 namespace myns { struct NewOrderReqMsg; }
+namespace myns { struct _db_zd_client_dbg_curs; }
 namespace myns { struct _db_cd_client_eof_curs; }
 namespace myns { struct _db_cd_client_read_curs; }
 namespace myns { struct _db_part_curs; }
@@ -110,11 +111,11 @@ namespace myns { // gen:ns_print_struct
 
 // --- myns.Client
 // create: myns.FDb.client (Tpool)
+// global access: zd_client_dbg (Llist)
 // global access: cd_client_eof (Llist)
 // global access: cd_client_read (Llist)
-// global access: ind_client (Thash, hash field client)
 struct Client { // myns.Client: client hook/socket
-    algo::Smallstr50    client;                //
+    algo::Smallstr50    client_port;           //
     algo_lib::FIohook   iohook;                //
     u8                  in_elems[8192];        // pointer to elements of inline array
     i32                 in_start;              // beginning of valid bytes (in bytes)
@@ -127,12 +128,13 @@ struct Client { // myns.Client: client hook/socket
     bool                in_epoll_enable;       // use epoll?
     enum { in_max = 8192 };
     algo::Smallstr50    lastbuff;              //
+    myns::Client*       client_next;           // Pointer to next free element int tpool
+    myns::Client*       zd_client_dbg_next;    // zslist link; -1 means not-in-list
+    myns::Client*       zd_client_dbg_prev;    // previous element
     myns::Client*       cd_client_eof_next;    // zslist link; -1 means not-in-list
     myns::Client*       cd_client_eof_prev;    // previous element
     myns::Client*       cd_client_read_next;   // zslist link; -1 means not-in-list
     myns::Client*       cd_client_read_prev;   // previous element
-    myns::Client*       client_next;           // Pointer to next free element int tpool
-    myns::Client*       ind_client_next;       // hash next
     // value field myns.Client.iohook is not copiable
     // field myns.Client.in prevents copy
     // func:myns.Client..AssignOp
@@ -226,40 +228,40 @@ void                 trace_Print(myns::trace& row, algo::cstring& str) __attribu
 // --- myns.FDb
 // create: myns.FDb._db (Global)
 struct FDb { // myns.FDb
-    command::myns       cmdline;                    //
-    myns::Client*       cd_client_eof_head;         // zero-terminated doubly linked list
-    i32                 cd_client_eof_n;            // zero-terminated doubly linked list
-    myns::Client*       cd_client_read_head;        // zero-terminated doubly linked list
-    i32                 cd_client_read_n;           // zero-terminated doubly linked list
-    bool                sched1;                     //   true
-    algo::SchedTime     sched1_next;                // myns.FDb.sched1                       Next invocation time
-    algo::SchedTime     sched1_delay;               // myns.FDb.sched1                       Delay between invocations
-    algo_lib::FIohook   listen;                     //
-    u64                 client_blocksize;           // # bytes per block
-    myns::Client*       client_free;                //
-    myns::Client**      ind_client_buckets_elems;   // pointer to bucket array
-    i32                 ind_client_buckets_n;       // number of elements in bucket array
-    i32                 ind_client_n;               // number of elements in the hash table
-    algo_lib::FIohook   terminal;                   //
-    myns::FPart*        part_lary[32];              // level array
-    i32                 part_n;                     // number of elements in array
-    myns::FPart*        zd_part_head;               // zero-terminated doubly linked list
-    i32                 zd_part_n;                  // zero-terminated doubly linked list
-    myns::FPart*        zd_part_tail;               // pointer to last element
-    myns::FPart**       ind_part_buckets_elems;     // pointer to bucket array
-    i32                 ind_part_buckets_n;         // number of elements in bucket array
-    i32                 ind_part_n;                 // number of elements in the hash table
-    u64                 order_blocksize;            // # bytes per block
-    myns::Order*        order_free;                 //
-    myns::Order**       ind_order_buckets_elems;    // pointer to bucket array
-    i32                 ind_order_buckets_n;        // number of elements in bucket array
-    i32                 ind_order_n;                // number of elements in the hash table
-    myns::Order*        zd_order_head;              // zero-terminated doubly linked list
-    i32                 zd_order_n;                 // zero-terminated doubly linked list
-    myns::Order*        zd_order_tail;              // pointer to last element
-    algo::SchedTime     zd_order_next;              // myns.FDb.zd_order                     Next invocation time
-    algo::SchedTime     zd_order_delay;             // myns.FDb.zd_order                     Delay between invocations
-    myns::trace         trace;                      //
+    command::myns       cmdline;                   //
+    u64                 client_blocksize;          // # bytes per block
+    myns::Client*       client_free;               //
+    myns::Client*       zd_client_dbg_head;        // zero-terminated doubly linked list
+    i32                 zd_client_dbg_n;           // zero-terminated doubly linked list
+    myns::Client*       zd_client_dbg_tail;        // pointer to last element
+    myns::Client*       cd_client_eof_head;        // zero-terminated doubly linked list
+    i32                 cd_client_eof_n;           // zero-terminated doubly linked list
+    myns::Client*       cd_client_read_head;       // zero-terminated doubly linked list
+    i32                 cd_client_read_n;          // zero-terminated doubly linked list
+    bool                sched1;                    //   true
+    algo::SchedTime     sched1_next;               // myns.FDb.sched1                       Next invocation time
+    algo::SchedTime     sched1_delay;              // myns.FDb.sched1                       Delay between invocations
+    algo_lib::FIohook   listen;                    //
+    algo_lib::FIohook   terminal;                  //
+    myns::FPart*        part_lary[32];             // level array
+    i32                 part_n;                    // number of elements in array
+    myns::FPart*        zd_part_head;              // zero-terminated doubly linked list
+    i32                 zd_part_n;                 // zero-terminated doubly linked list
+    myns::FPart*        zd_part_tail;              // pointer to last element
+    myns::FPart**       ind_part_buckets_elems;    // pointer to bucket array
+    i32                 ind_part_buckets_n;        // number of elements in bucket array
+    i32                 ind_part_n;                // number of elements in the hash table
+    u64                 order_blocksize;           // # bytes per block
+    myns::Order*        order_free;                //
+    myns::Order**       ind_order_buckets_elems;   // pointer to bucket array
+    i32                 ind_order_buckets_n;       // number of elements in bucket array
+    i32                 ind_order_n;               // number of elements in the hash table
+    myns::Order*        zd_order_head;             // zero-terminated doubly linked list
+    i32                 zd_order_n;                // zero-terminated doubly linked list
+    myns::Order*        zd_order_tail;             // pointer to last element
+    algo::SchedTime     zd_order_next;             // myns.FDb.zd_order                     Next invocation time
+    algo::SchedTime     zd_order_delay;            // myns.FDb.zd_order                     Delay between invocations
+    myns::trace         trace;                     //
 };
 
 // Read argc,argv directly into the fields of the command line(s)
@@ -306,6 +308,73 @@ void                 Steps();
 // in algo_lib::_db.errtext and return false. Caller must Delete or Unref such row.
 // func:myns.FDb._db.XrefMaybe
 bool                 _db_XrefMaybe();
+
+// Allocate memory for new default row.
+// If out of memory, process is killed.
+// func:myns.FDb.client.Alloc
+myns::Client&        client_Alloc() __attribute__((__warn_unused_result__, nothrow));
+// Allocate memory for new element. If out of memory, return NULL.
+// func:myns.FDb.client.AllocMaybe
+myns::Client*        client_AllocMaybe() __attribute__((__warn_unused_result__, nothrow));
+// Remove row from all global and cross indices, then deallocate row
+// func:myns.FDb.client.Delete
+void                 client_Delete(myns::Client &row) __attribute__((nothrow));
+// Allocate space for one element
+// If no memory available, return NULL.
+// func:myns.FDb.client.AllocMem
+void*                client_AllocMem() __attribute__((__warn_unused_result__, nothrow));
+// Remove mem from all global and cross indices, then deallocate mem
+// func:myns.FDb.client.FreeMem
+void                 client_FreeMem(myns::Client &row) __attribute__((nothrow));
+// Preallocate memory for N more elements
+// Return number of elements actually reserved.
+// func:myns.FDb.client.Reserve
+u64                  client_Reserve(u64 n_elems) __attribute__((nothrow));
+// Allocate block of given size, break up into small elements and append to free list.
+// Return number of elements reserved.
+// func:myns.FDb.client.ReserveMem
+u64                  client_ReserveMem(u64 size) __attribute__((nothrow));
+// Insert row into all appropriate indices. If error occurs, store error
+// in algo_lib::_db.errtext and return false. Caller must Delete or Unref such row.
+// func:myns.FDb.client.XrefMaybe
+bool                 client_XrefMaybe(myns::Client &row);
+
+// Return true if index is empty
+// func:myns.FDb.zd_client_dbg.EmptyQ
+inline bool          zd_client_dbg_EmptyQ() __attribute__((__warn_unused_result__, nothrow, pure));
+// If index empty, return NULL. Otherwise return pointer to first element in index
+// func:myns.FDb.zd_client_dbg.First
+inline myns::Client* zd_client_dbg_First() __attribute__((__warn_unused_result__, nothrow, pure));
+// Return true if row is in the linked list, false otherwise
+// func:myns.FDb.zd_client_dbg.InLlistQ
+inline bool          zd_client_dbg_InLlistQ(myns::Client& row) __attribute__((__warn_unused_result__, nothrow));
+// Insert row into linked list. If row is already in linked list, do nothing.
+// func:myns.FDb.zd_client_dbg.Insert
+void                 zd_client_dbg_Insert(myns::Client& row) __attribute__((nothrow));
+// If index empty, return NULL. Otherwise return pointer to last element in index
+// func:myns.FDb.zd_client_dbg.Last
+inline myns::Client* zd_client_dbg_Last() __attribute__((__warn_unused_result__, nothrow, pure));
+// Return number of items in the linked list
+// func:myns.FDb.zd_client_dbg.N
+inline i32           zd_client_dbg_N() __attribute__((__warn_unused_result__, nothrow, pure));
+// Return pointer to next element in the list
+// func:myns.FDb.zd_client_dbg.Next
+inline myns::Client* zd_client_dbg_Next(myns::Client &row) __attribute__((__warn_unused_result__, nothrow));
+// Return pointer to previous element in the list
+// func:myns.FDb.zd_client_dbg.Prev
+inline myns::Client* zd_client_dbg_Prev(myns::Client &row) __attribute__((__warn_unused_result__, nothrow));
+// Remove element from index. If element is not in index, do nothing.
+// func:myns.FDb.zd_client_dbg.Remove
+void                 zd_client_dbg_Remove(myns::Client& row) __attribute__((nothrow));
+// Empty the index. (The rows are not deleted)
+// func:myns.FDb.zd_client_dbg.RemoveAll
+void                 zd_client_dbg_RemoveAll() __attribute__((nothrow));
+// If linked list is empty, return NULL. Otherwise unlink and return pointer to first element.
+// func:myns.FDb.zd_client_dbg.RemoveFirst
+myns::Client*        zd_client_dbg_RemoveFirst() __attribute__((nothrow));
+// Return reference to last element in the index. No bounds checking.
+// func:myns.FDb.zd_client_dbg.qLast
+inline myns::Client& zd_client_dbg_qLast() __attribute__((__warn_unused_result__, nothrow));
 
 // Return true if index is empty
 // func:myns.FDb.cd_client_eof.EmptyQ
@@ -404,61 +473,6 @@ void                 sched1_Step() __attribute__((nothrow));
 // The difference between new delay and current delay is added to the next scheduled time.
 // func:myns.FDb.sched1.SetDelay
 void                 sched1_SetDelay(algo::SchedTime delay) __attribute__((nothrow));
-
-// Allocate memory for new default row.
-// If out of memory, process is killed.
-// func:myns.FDb.client.Alloc
-myns::Client&        client_Alloc() __attribute__((__warn_unused_result__, nothrow));
-// Allocate memory for new element. If out of memory, return NULL.
-// func:myns.FDb.client.AllocMaybe
-myns::Client*        client_AllocMaybe() __attribute__((__warn_unused_result__, nothrow));
-// Remove row from all global and cross indices, then deallocate row
-// func:myns.FDb.client.Delete
-void                 client_Delete(myns::Client &row) __attribute__((nothrow));
-// Allocate space for one element
-// If no memory available, return NULL.
-// func:myns.FDb.client.AllocMem
-void*                client_AllocMem() __attribute__((__warn_unused_result__, nothrow));
-// Remove mem from all global and cross indices, then deallocate mem
-// func:myns.FDb.client.FreeMem
-void                 client_FreeMem(myns::Client &row) __attribute__((nothrow));
-// Preallocate memory for N more elements
-// Return number of elements actually reserved.
-// func:myns.FDb.client.Reserve
-u64                  client_Reserve(u64 n_elems) __attribute__((nothrow));
-// Allocate block of given size, break up into small elements and append to free list.
-// Return number of elements reserved.
-// func:myns.FDb.client.ReserveMem
-u64                  client_ReserveMem(u64 size) __attribute__((nothrow));
-// Insert row into all appropriate indices. If error occurs, store error
-// in algo_lib::_db.errtext and return false. Caller must Delete or Unref such row.
-// func:myns.FDb.client.XrefMaybe
-bool                 client_XrefMaybe(myns::Client &row);
-
-// Return true if hash is empty
-// func:myns.FDb.ind_client.EmptyQ
-inline bool          ind_client_EmptyQ() __attribute__((nothrow));
-// Find row by key. Return NULL if not found.
-// func:myns.FDb.ind_client.Find
-myns::Client*        ind_client_Find(const algo::strptr& key) __attribute__((__warn_unused_result__, nothrow));
-// Look up row by key and return reference. Throw exception if not found
-// func:myns.FDb.ind_client.FindX
-myns::Client&        ind_client_FindX(const algo::strptr& key);
-// Find row by key. If not found, create and x-reference a new row with with this key.
-// func:myns.FDb.ind_client.GetOrCreate
-myns::Client&        ind_client_GetOrCreate(const algo::strptr& key) __attribute__((nothrow));
-// Return number of items in the hash
-// func:myns.FDb.ind_client.N
-inline i32           ind_client_N() __attribute__((__warn_unused_result__, nothrow, pure));
-// Insert row into hash table. Return true if row is reachable through the hash after the function completes.
-// func:myns.FDb.ind_client.InsertMaybe
-bool                 ind_client_InsertMaybe(myns::Client& row) __attribute__((nothrow));
-// Remove reference to element from hash index. If element is not in hash, do nothing
-// func:myns.FDb.ind_client.Remove
-void                 ind_client_Remove(myns::Client& row) __attribute__((nothrow));
-// Reserve enough room in the hash for N more elements. Return success code.
-// func:myns.FDb.ind_client.Reserve
-void                 ind_client_Reserve(int n) __attribute__((nothrow));
 
 // Allocate memory for new default row.
 // If out of memory, process is killed.
@@ -665,6 +679,18 @@ void                 zd_order_Step() __attribute__((nothrow));
 // func:myns.FDb.zd_order.SetDelay
 void                 zd_order_SetDelay(algo::SchedTime delay) __attribute__((nothrow));
 
+// cursor points to valid item
+// func:myns.FDb.zd_client_dbg_curs.Reset
+inline void          _db_zd_client_dbg_curs_Reset(_db_zd_client_dbg_curs &curs, myns::FDb &parent) __attribute__((nothrow));
+// cursor points to valid item
+// func:myns.FDb.zd_client_dbg_curs.ValidQ
+inline bool          _db_zd_client_dbg_curs_ValidQ(_db_zd_client_dbg_curs &curs) __attribute__((nothrow));
+// proceed to next item
+// func:myns.FDb.zd_client_dbg_curs.Next
+inline void          _db_zd_client_dbg_curs_Next(_db_zd_client_dbg_curs &curs) __attribute__((nothrow));
+// item access
+// func:myns.FDb.zd_client_dbg_curs.Access
+inline myns::Client& _db_zd_client_dbg_curs_Access(_db_zd_client_dbg_curs &curs) __attribute__((nothrow));
 // cursor points to valid item
 // func:myns.FDb.cd_client_eof_curs.Reset
 inline void          _db_cd_client_eof_curs_Reset(_db_cd_client_eof_curs &curs, myns::FDb &parent) __attribute__((nothrow));
@@ -1205,6 +1231,15 @@ inline void          TableId_Init(myns::TableId& parent);
 void                 TableId_Print(myns::TableId& row, algo::cstring& str) __attribute__((nothrow));
 } // gen:ns_print_struct
 namespace myns { // gen:ns_curstext
+
+struct _db_zd_client_dbg_curs {// fcurs:myns.FDb.zd_client_dbg/curs
+    typedef myns::Client ChildType;
+    myns::Client* row;
+    _db_zd_client_dbg_curs() {
+        row = NULL;
+    }
+};
+
 
 struct _db_cd_client_eof_curs {// fcurs:myns.FDb.cd_client_eof/curs
     typedef myns::Client ChildType;

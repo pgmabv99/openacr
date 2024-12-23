@@ -307,20 +307,21 @@ void myns::Client_Init(myns::Client& client) {
     client.in_msgvalid = false; // in: initialize
     client.in_msglen = 0; // in: initialize
     client.in_epoll_enable = true; // in: initialize
+    client.client_next = (myns::Client*)-1; // (myns.FDb.client) not-in-tpool's freelist
+    client.zd_client_dbg_next = (myns::Client*)-1; // (myns.FDb.zd_client_dbg) not-in-list
+    client.zd_client_dbg_prev = NULL; // (myns.FDb.zd_client_dbg)
     client.cd_client_eof_next = (myns::Client*)-1; // (myns.FDb.cd_client_eof) not-in-list
     client.cd_client_eof_prev = NULL; // (myns.FDb.cd_client_eof)
     client.cd_client_read_next = (myns::Client*)-1; // (myns.FDb.cd_client_read) not-in-list
     client.cd_client_read_prev = NULL; // (myns.FDb.cd_client_read)
-    client.client_next = (myns::Client*)-1; // (myns.FDb.client) not-in-tpool's freelist
-    client.ind_client_next = (myns::Client*)-1; // (myns.FDb.ind_client) not-in-hash
 }
 
 // --- myns.Client..Uninit
 void myns::Client_Uninit(myns::Client& client) {
     myns::Client &row = client; (void)row;
+    zd_client_dbg_Remove(row); // remove client from index zd_client_dbg
     cd_client_eof_Remove(row); // remove client from index cd_client_eof
     cd_client_read_Remove(row); // remove client from index cd_client_read
-    ind_client_Remove(row); // remove client from index ind_client
 }
 
 // --- myns.trace..Print
@@ -615,6 +616,177 @@ bool myns::_db_XrefMaybe() {
     return retval;
 }
 
+// --- myns.FDb.client.Alloc
+// Allocate memory for new default row.
+// If out of memory, process is killed.
+myns::Client& myns::client_Alloc() {
+    myns::Client* row = client_AllocMaybe();
+    if (UNLIKELY(row == NULL)) {
+        FatalErrorExit("myns.out_of_mem  field:myns.FDb.client  comment:'Alloc failed'");
+    }
+    return *row;
+}
+
+// --- myns.FDb.client.AllocMaybe
+// Allocate memory for new element. If out of memory, return NULL.
+myns::Client* myns::client_AllocMaybe() {
+    myns::Client *row = (myns::Client*)client_AllocMem();
+    if (row) {
+        new (row) myns::Client; // call constructor
+    }
+    return row;
+}
+
+// --- myns.FDb.client.Delete
+// Remove row from all global and cross indices, then deallocate row
+void myns::client_Delete(myns::Client &row) {
+    row.~Client();
+    client_FreeMem(row);
+}
+
+// --- myns.FDb.client.AllocMem
+// Allocate space for one element
+// If no memory available, return NULL.
+void* myns::client_AllocMem() {
+    myns::Client *row = _db.client_free;
+    if (UNLIKELY(!row)) {
+        client_Reserve(1);
+        row = _db.client_free;
+    }
+    if (row) {
+        _db.client_free = row->client_next;
+    }
+    return row;
+}
+
+// --- myns.FDb.client.FreeMem
+// Remove mem from all global and cross indices, then deallocate mem
+void myns::client_FreeMem(myns::Client &row) {
+    if (UNLIKELY(row.client_next != (myns::Client*)-1)) {
+        FatalErrorExit("myns.tpool_double_delete  pool:myns.FDb.client  comment:'double deletion caught'");
+    }
+    row.client_next = _db.client_free; // insert into free list
+    _db.client_free  = &row;
+}
+
+// --- myns.FDb.client.Reserve
+// Preallocate memory for N more elements
+// Return number of elements actually reserved.
+u64 myns::client_Reserve(u64 n_elems) {
+    u64 ret = 0;
+    while (ret < n_elems) {
+        u64 size = _db.client_blocksize; // underlying allocator is probably Lpool
+        u64 reserved = client_ReserveMem(size);
+        ret += reserved;
+        if (reserved == 0) {
+            break;
+        }
+    }
+    return ret;
+}
+
+// --- myns.FDb.client.ReserveMem
+// Allocate block of given size, break up into small elements and append to free list.
+// Return number of elements reserved.
+u64 myns::client_ReserveMem(u64 size) {
+    u64 ret = 0;
+    if (size >= sizeof(myns::Client)) {
+        myns::Client *mem = (myns::Client*)algo_lib::malloc_AllocMem(size);
+        ret = mem ? size / sizeof(myns::Client) : 0;
+        // add newly allocated elements to the free list;
+        for (u64 i=0; i < ret; i++) {
+            mem[i].client_next = _db.client_free;
+            _db.client_free = mem+i;
+        }
+    }
+    return ret;
+}
+
+// --- myns.FDb.client.XrefMaybe
+// Insert row into all appropriate indices. If error occurs, store error
+// in algo_lib::_db.errtext and return false. Caller must Delete or Unref such row.
+bool myns::client_XrefMaybe(myns::Client &row) {
+    bool retval = true;
+    (void)row;
+    // insert client into index zd_client_dbg
+    if (true) { // user-defined insert condition
+        zd_client_dbg_Insert(row);
+    }
+    return retval;
+}
+
+// --- myns.FDb.zd_client_dbg.Insert
+// Insert row into linked list. If row is already in linked list, do nothing.
+void myns::zd_client_dbg_Insert(myns::Client& row) {
+    if (!zd_client_dbg_InLlistQ(row)) {
+        myns::Client* old_tail = _db.zd_client_dbg_tail;
+        row.zd_client_dbg_next = NULL;
+        row.zd_client_dbg_prev = old_tail;
+        _db.zd_client_dbg_tail = &row;
+        myns::Client **new_row_a = &old_tail->zd_client_dbg_next;
+        myns::Client **new_row_b = &_db.zd_client_dbg_head;
+        myns::Client **new_row = old_tail ? new_row_a : new_row_b;
+        *new_row = &row;
+        _db.zd_client_dbg_n++;
+    }
+}
+
+// --- myns.FDb.zd_client_dbg.Remove
+// Remove element from index. If element is not in index, do nothing.
+void myns::zd_client_dbg_Remove(myns::Client& row) {
+    if (zd_client_dbg_InLlistQ(row)) {
+        myns::Client* old_head       = _db.zd_client_dbg_head;
+        (void)old_head; // in case it's not used
+        myns::Client* prev = row.zd_client_dbg_prev;
+        myns::Client* next = row.zd_client_dbg_next;
+        // if element is first, adjust list head; otherwise, adjust previous element's next
+        myns::Client **new_next_a = &prev->zd_client_dbg_next;
+        myns::Client **new_next_b = &_db.zd_client_dbg_head;
+        myns::Client **new_next = prev ? new_next_a : new_next_b;
+        *new_next = next;
+        // if element is last, adjust list tail; otherwise, adjust next element's prev
+        myns::Client **new_prev_a = &next->zd_client_dbg_prev;
+        myns::Client **new_prev_b = &_db.zd_client_dbg_tail;
+        myns::Client **new_prev = next ? new_prev_a : new_prev_b;
+        *new_prev = prev;
+        _db.zd_client_dbg_n--;
+        row.zd_client_dbg_next=(myns::Client*)-1; // not-in-list
+    }
+}
+
+// --- myns.FDb.zd_client_dbg.RemoveAll
+// Empty the index. (The rows are not deleted)
+void myns::zd_client_dbg_RemoveAll() {
+    myns::Client* row = _db.zd_client_dbg_head;
+    _db.zd_client_dbg_head = NULL;
+    _db.zd_client_dbg_tail = NULL;
+    _db.zd_client_dbg_n = 0;
+    while (row) {
+        myns::Client* row_next = row->zd_client_dbg_next;
+        row->zd_client_dbg_next  = (myns::Client*)-1;
+        row->zd_client_dbg_prev  = NULL;
+        row = row_next;
+    }
+}
+
+// --- myns.FDb.zd_client_dbg.RemoveFirst
+// If linked list is empty, return NULL. Otherwise unlink and return pointer to first element.
+myns::Client* myns::zd_client_dbg_RemoveFirst() {
+    myns::Client *row = NULL;
+    row = _db.zd_client_dbg_head;
+    if (row) {
+        myns::Client *next = row->zd_client_dbg_next;
+        _db.zd_client_dbg_head = next;
+        myns::Client **new_end_a = &next->zd_client_dbg_prev;
+        myns::Client **new_end_b = &_db.zd_client_dbg_tail;
+        myns::Client **new_end = next ? new_end_a : new_end_b;
+        *new_end = NULL;
+        _db.zd_client_dbg_n--;
+        row->zd_client_dbg_next = (myns::Client*)-1; // mark as not-in-list
+    }
+    return row;
+}
+
 // --- myns.FDb.cd_client_eof.Insert
 // Insert row into linked list. If row is already in linked list, do nothing.
 void myns::cd_client_eof_Insert(myns::Client& row) {
@@ -872,232 +1044,6 @@ void myns::sched1_SetDelay(algo::SchedTime delay) {
         myns::_db.sched1_next.value += diff;
     } else {
         myns::_db.sched1_next.value = algo::u64_SubClip(myns::_db.sched1_next.value,-diff);
-    }
-}
-
-// --- myns.FDb.client.Alloc
-// Allocate memory for new default row.
-// If out of memory, process is killed.
-myns::Client& myns::client_Alloc() {
-    myns::Client* row = client_AllocMaybe();
-    if (UNLIKELY(row == NULL)) {
-        FatalErrorExit("myns.out_of_mem  field:myns.FDb.client  comment:'Alloc failed'");
-    }
-    return *row;
-}
-
-// --- myns.FDb.client.AllocMaybe
-// Allocate memory for new element. If out of memory, return NULL.
-myns::Client* myns::client_AllocMaybe() {
-    myns::Client *row = (myns::Client*)client_AllocMem();
-    if (row) {
-        new (row) myns::Client; // call constructor
-    }
-    return row;
-}
-
-// --- myns.FDb.client.Delete
-// Remove row from all global and cross indices, then deallocate row
-void myns::client_Delete(myns::Client &row) {
-    row.~Client();
-    client_FreeMem(row);
-}
-
-// --- myns.FDb.client.AllocMem
-// Allocate space for one element
-// If no memory available, return NULL.
-void* myns::client_AllocMem() {
-    myns::Client *row = _db.client_free;
-    if (UNLIKELY(!row)) {
-        client_Reserve(1);
-        row = _db.client_free;
-    }
-    if (row) {
-        _db.client_free = row->client_next;
-    }
-    return row;
-}
-
-// --- myns.FDb.client.FreeMem
-// Remove mem from all global and cross indices, then deallocate mem
-void myns::client_FreeMem(myns::Client &row) {
-    if (UNLIKELY(row.client_next != (myns::Client*)-1)) {
-        FatalErrorExit("myns.tpool_double_delete  pool:myns.FDb.client  comment:'double deletion caught'");
-    }
-    row.client_next = _db.client_free; // insert into free list
-    _db.client_free  = &row;
-}
-
-// --- myns.FDb.client.Reserve
-// Preallocate memory for N more elements
-// Return number of elements actually reserved.
-u64 myns::client_Reserve(u64 n_elems) {
-    u64 ret = 0;
-    while (ret < n_elems) {
-        u64 size = _db.client_blocksize; // underlying allocator is probably Lpool
-        u64 reserved = client_ReserveMem(size);
-        ret += reserved;
-        if (reserved == 0) {
-            break;
-        }
-    }
-    return ret;
-}
-
-// --- myns.FDb.client.ReserveMem
-// Allocate block of given size, break up into small elements and append to free list.
-// Return number of elements reserved.
-u64 myns::client_ReserveMem(u64 size) {
-    u64 ret = 0;
-    if (size >= sizeof(myns::Client)) {
-        myns::Client *mem = (myns::Client*)algo_lib::malloc_AllocMem(size);
-        ret = mem ? size / sizeof(myns::Client) : 0;
-        // add newly allocated elements to the free list;
-        for (u64 i=0; i < ret; i++) {
-            mem[i].client_next = _db.client_free;
-            _db.client_free = mem+i;
-        }
-    }
-    return ret;
-}
-
-// --- myns.FDb.client.XrefMaybe
-// Insert row into all appropriate indices. If error occurs, store error
-// in algo_lib::_db.errtext and return false. Caller must Delete or Unref such row.
-bool myns::client_XrefMaybe(myns::Client &row) {
-    bool retval = true;
-    (void)row;
-    // insert client into index ind_client
-    if (true) { // user-defined insert condition
-        bool success = ind_client_InsertMaybe(row);
-        if (UNLIKELY(!success)) {
-            ch_RemoveAll(algo_lib::_db.errtext);
-            algo_lib::_db.errtext << "myns.duplicate_key  xref:myns.FDb.ind_client"; // check for duplicate key
-            return false;
-        }
-    }
-    return retval;
-}
-
-// --- myns.FDb.ind_client.Find
-// Find row by key. Return NULL if not found.
-myns::Client* myns::ind_client_Find(const algo::strptr& key) {
-    u32 index = algo::Smallstr50_Hash(0, key) & (_db.ind_client_buckets_n - 1);
-    myns::Client* *e = &_db.ind_client_buckets_elems[index];
-    myns::Client* ret=NULL;
-    do {
-        ret       = *e;
-        bool done = !ret || (*ret).client == key;
-        if (done) break;
-        e         = &ret->ind_client_next;
-    } while (true);
-    return ret;
-}
-
-// --- myns.FDb.ind_client.FindX
-// Look up row by key and return reference. Throw exception if not found
-myns::Client& myns::ind_client_FindX(const algo::strptr& key) {
-    myns::Client* ret = ind_client_Find(key);
-    vrfy(ret, tempstr() << "myns.key_error  table:ind_client  key:'"<<key<<"'  comment:'key not found'");
-    return *ret;
-}
-
-// --- myns.FDb.ind_client.GetOrCreate
-// Find row by key. If not found, create and x-reference a new row with with this key.
-myns::Client& myns::ind_client_GetOrCreate(const algo::strptr& key) {
-    myns::Client* ret = ind_client_Find(key);
-    if (!ret) { //  if memory alloc fails, process dies; if insert fails, function returns NULL.
-        ret         = &client_Alloc();
-        (*ret).client = key;
-        bool good = client_XrefMaybe(*ret);
-        if (!good) {
-            client_Delete(*ret); // delete offending row, any existin xrefs are cleared
-            ret = NULL;
-        }
-    }
-    vrfy(ret, tempstr() << "myns.create_error  table:ind_client  key:'"<<key<<"'  comment:'bad xref'");
-    return *ret;
-}
-
-// --- myns.FDb.ind_client.InsertMaybe
-// Insert row into hash table. Return true if row is reachable through the hash after the function completes.
-bool myns::ind_client_InsertMaybe(myns::Client& row) {
-    ind_client_Reserve(1);
-    bool retval = true; // if already in hash, InsertMaybe returns true
-    if (LIKELY(row.ind_client_next == (myns::Client*)-1)) {// check if in hash already
-        u32 index = algo::Smallstr50_Hash(0, row.client) & (_db.ind_client_buckets_n - 1);
-        myns::Client* *prev = &_db.ind_client_buckets_elems[index];
-        do {
-            myns::Client* ret = *prev;
-            if (!ret) { // exit condition 1: reached the end of the list
-                break;
-            }
-            if ((*ret).client == row.client) { // exit condition 2: found matching key
-                retval = false;
-                break;
-            }
-            prev = &ret->ind_client_next;
-        } while (true);
-        if (retval) {
-            row.ind_client_next = *prev;
-            _db.ind_client_n++;
-            *prev = &row;
-        }
-    }
-    return retval;
-}
-
-// --- myns.FDb.ind_client.Remove
-// Remove reference to element from hash index. If element is not in hash, do nothing
-void myns::ind_client_Remove(myns::Client& row) {
-    if (LIKELY(row.ind_client_next != (myns::Client*)-1)) {// check if in hash already
-        u32 index = algo::Smallstr50_Hash(0, row.client) & (_db.ind_client_buckets_n - 1);
-        myns::Client* *prev = &_db.ind_client_buckets_elems[index]; // addr of pointer to current element
-        while (myns::Client *next = *prev) {                          // scan the collision chain for our element
-            if (next == &row) {        // found it?
-                *prev = next->ind_client_next; // unlink (singly linked list)
-                _db.ind_client_n--;
-                row.ind_client_next = (myns::Client*)-1;// not-in-hash
-                break;
-            }
-            prev = &next->ind_client_next;
-        }
-    }
-}
-
-// --- myns.FDb.ind_client.Reserve
-// Reserve enough room in the hash for N more elements. Return success code.
-void myns::ind_client_Reserve(int n) {
-    u32 old_nbuckets = _db.ind_client_buckets_n;
-    u32 new_nelems   = _db.ind_client_n + n;
-    // # of elements has to be roughly equal to the number of buckets
-    if (new_nelems > old_nbuckets) {
-        int new_nbuckets = i32_Max(algo::BumpToPow2(new_nelems), u32(4));
-        u32 old_size = old_nbuckets * sizeof(myns::Client*);
-        u32 new_size = new_nbuckets * sizeof(myns::Client*);
-        // allocate new array. we don't use Realloc since copying is not needed and factor of 2 probably
-        // means new memory will have to be allocated anyway
-        myns::Client* *new_buckets = (myns::Client**)algo_lib::malloc_AllocMem(new_size);
-        if (UNLIKELY(!new_buckets)) {
-            FatalErrorExit("myns.out_of_memory  field:myns.FDb.ind_client");
-        }
-        memset(new_buckets, 0, new_size); // clear pointers
-        // rehash all entries
-        for (int i = 0; i < _db.ind_client_buckets_n; i++) {
-            myns::Client* elem = _db.ind_client_buckets_elems[i];
-            while (elem) {
-                myns::Client &row        = *elem;
-                myns::Client* next       = row.ind_client_next;
-                u32 index          = algo::Smallstr50_Hash(0, row.client) & (new_nbuckets-1);
-                row.ind_client_next     = new_buckets[index];
-                new_buckets[index] = &row;
-                elem               = next;
-            }
-        }
-        // free old array
-        algo_lib::malloc_FreeMem(_db.ind_client_buckets_elems, old_size);
-        _db.ind_client_buckets_elems = new_buckets;
-        _db.ind_client_buckets_n = new_nbuckets;
     }
 }
 
@@ -1773,23 +1719,18 @@ inline static i32 myns::trace_N() {
 // --- myns.FDb..Init
 // Set all fields to initial values.
 void myns::FDb_Init() {
+    // client: initialize Tpool
+    _db.client_free      = NULL;
+    _db.client_blocksize = algo::BumpToPow2(64 * sizeof(myns::Client)); // allocate 64-127 elements at a time
+    _db.zd_client_dbg_head = NULL; // (myns.FDb.zd_client_dbg)
+    _db.zd_client_dbg_n = 0; // (myns.FDb.zd_client_dbg)
+    _db.zd_client_dbg_tail = NULL; // (myns.FDb.zd_client_dbg)
     _db.cd_client_eof_head = NULL; // (myns.FDb.cd_client_eof)
     _db.cd_client_eof_n = 0; // (myns.FDb.cd_client_eof)
     _db.cd_client_read_head = NULL; // (myns.FDb.cd_client_read)
     _db.cd_client_read_n = 0; // (myns.FDb.cd_client_read)
     _db.sched1 = bool(true);
     myns::_db.sched1_delay = algo::ToSchedTime(5); // initialize fstep delay (myns.FDb.sched1)
-    // client: initialize Tpool
-    _db.client_free      = NULL;
-    _db.client_blocksize = algo::BumpToPow2(64 * sizeof(myns::Client)); // allocate 64-127 elements at a time
-    // initialize hash table for myns::Client;
-    _db.ind_client_n             	= 0; // (myns.FDb.ind_client)
-    _db.ind_client_buckets_n     	= 4; // (myns.FDb.ind_client)
-    _db.ind_client_buckets_elems 	= (myns::Client**)algo_lib::malloc_AllocMem(sizeof(myns::Client*)*_db.ind_client_buckets_n); // initial buckets (myns.FDb.ind_client)
-    if (!_db.ind_client_buckets_elems) {
-        FatalErrorExit("out of memory"); // (myns.FDb.ind_client)
-    }
-    memset(_db.ind_client_buckets_elems, 0, sizeof(myns::Client*)*_db.ind_client_buckets_n); // (myns.FDb.ind_client)
     // initialize LAry part (myns.FDb.part)
     _db.part_n = 0;
     memset(_db.part_lary, 0, sizeof(_db.part_lary)); // zero out all level pointers
@@ -1844,9 +1785,6 @@ void myns::FDb_Uninit() {
 
     // myns.FDb.part.Uninit (Lary)  //
     // skip destruction in global scope
-
-    // myns.FDb.ind_client.Uninit (Thash)  //
-    // skip destruction of ind_client in global scope
 }
 
 // --- myns.FPart.base.CopyOut

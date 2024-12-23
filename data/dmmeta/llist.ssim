@@ -96,6 +96,7 @@ dmmeta.llist  field:lib_ctype.FField.zd_fconst  havetail:Y  havecount:Y  comment
 dmmeta.llist  field:lib_exec.FDb.zd_started  havetail:Y  havecount:Y  comment:""
 dmmeta.llist  field:myns.FDb.cd_client_eof  havetail:N  havecount:Y  comment:""
 dmmeta.llist  field:myns.FDb.cd_client_read  havetail:N  havecount:Y  comment:""
+dmmeta.llist  field:myns.FDb.zd_client_dbg  havetail:Y  havecount:Y  comment:""
 dmmeta.llist  field:myns.FDb.zd_order  havetail:Y  havecount:Y  comment:""
 dmmeta.llist  field:myns.FDb.zd_part  havetail:Y  havecount:Y  comment:""
 dmmeta.llist  field:myns.FPart.zd_partorder  havetail:Y  havecount:Y  comment:""

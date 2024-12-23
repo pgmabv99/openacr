@@ -343,7 +343,7 @@ void myns::tcp_accept()
 
     char port_char_array[6];                                        // Array to store the port as a string (max length 5 digits + 1 for '\0')
     sprintf(port_char_array, "%d", ntohs(client_address.sin_port)); // Convert port to character array
-    client_obj.client = port_char_array;
+    client_obj.client_port = port_char_array;
 
     // Make the new socket non-blocking and add it to epoll  via callback
     client_obj.iohook.fildes = algo::Fildes(client_socket);
@@ -455,7 +455,7 @@ void myns::cd_client_eof_Step() {
     // client_RemoveAll();
 }
 
-// callback to Read next input line from stdin
+// callback to Read next input line from the socket
 void myns::cd_client_read_Step() {
     myns::Client &client = *cd_client_read_RotateFirst();
     algo::strptr msgstr = in_GetMsg(client);

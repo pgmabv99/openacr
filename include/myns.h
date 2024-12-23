@@ -35,7 +35,7 @@ namespace myns { // update-hdr
     //     (user-implemented function, prototype is in amc-generated header)
     // void cd_client_eof_Step();
 
-    // callback to Read next input line from stdin
+    // callback to Read next input line from the socket
     // void cd_client_read_Step();
 
     // -------------------------------------------------------------------
