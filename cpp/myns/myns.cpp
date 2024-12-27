@@ -452,11 +452,13 @@ void myns::In_NewOrderReqMsg(myns::NewOrderReqMsg &msg)
 
 void myns::cd_client_eof_Step() {
     prlog("==cd_client_eof_Step");
-    // client_RemoveAll();
+    myns::Client &client = *cd_client_read_RotateFirst();
+    client_Delete(client);
 }
 
 // callback to Read next input line from the socket
 void myns::cd_client_read_Step() {
+    prlog("==cd_client_read_Step");
     myns::Client &client = *cd_client_read_RotateFirst();
     algo::strptr msgstr = in_GetMsg(client);
     if (msgstr.elems) {
